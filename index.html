@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>はかるもん</title>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#CC4A00">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="はかるもん">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'M PLUS Rounded 1c', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif;
+      background: #DDCBA0;
+      color: #3a2010;
+      min-height: 100vh;
+      padding-bottom: 40px;
+    }
+
+    header {
+      background: #CC4A00;
+      color: white;
+      padding: 16px 20px;
+      text-align: center;
+    }
+    header h1 { font-size: 1.2rem; font-weight: bold; }
+    header p { font-size: 0.8rem; margin-top: 4px; opacity: 0.9; }
+
+    .container { padding: 16px; max-width: 500px; margin: 0 auto; }
+
+    /* ---- タブ ---- */
+    .type-tabs {
+      display: flex;
+      background: white;
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      gap: 2px;
+    }
+    .type-tab {
+      flex: 1;
+      padding: 10px 2px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      background: transparent;
+      color: #aaa;
+      cursor: pointer;
+      font-family: inherit;
+      line-height: 1.3;
+    }
+    .type-tab.active {
+      background: #CC4A00;
+      color: white;
+    }
+
+    /* ---- カード ---- */
+    .card {
+      background: #9CC6DB;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .card h2 {
+      font-size: 0.95rem;
+      font-weight: bold;
+      color: #3a2010;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid rgba(58,32,16,0.2);
+    }
+
+    /* ---- トグルボタン ---- */
+    .toggle-row {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+    .toggle-btn {
+      flex: 1;
+      padding: 9px 4px;
+      border: 2px solid #CC4A00;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: bold;
+      background: white;
+      color: #CC4A00;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .toggle-btn.active {
+      background: #CC4A00;
+      color: white;
+    }
+
+    /* ---- 入力行 ---- */
+    .input-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .input-row label {
+      font-size: 0.88rem;
+      color: #3a2010;
+      flex: 0 0 52px;
+    }
+    .input-row input[type="number"] {
+      flex: 1;
+      padding: 11px 12px;
+      border: 1px solid rgba(58,32,16,0.2);
+      border-radius: 8px;
+      font-size: 1rem;
+      text-align: right;
+      background: white;
+      font-family: inherit;
+      color: #3a2010;
+    }
+    .input-row input[type="number"]:focus {
+      outline: none;
+      border-color: #CC4A00;
+    }
+    .input-row .unit {
+      font-size: 0.9rem;
+      color: #3a2010;
+      flex: 0 0 24px;
+    }
+
+    .auto-hint {
+      font-size: 0.8rem;
+      color: rgba(58,32,16,0.55);
+      text-align: right;
+      margin-top: -6px;
+      margin-bottom: 10px;
+      padding-right: 32px;
+    }
+
+    /* ---- セレクト ---- */
+    .kin-select {
+      flex: 1;
+      padding: 11px 12px;
+      border: 1px solid rgba(58,32,16,0.2);
+      border-radius: 8px;
+      font-size: 1rem;
+      background: white;
+      color: #3a2010;
+      font-family: inherit;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23CC4A00'/>%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      cursor: pointer;
+    }
+    .kin-select:focus { outline: none; border-color: #CC4A00; }
+
+    /* ---- 計算ボタン ---- */
+    .calc-btn {
+      width: 100%;
+      padding: 14px;
+      background: #CC4A00;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.05rem;
+      font-weight: bold;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      font-family: inherit;
+    }
+    .calc-btn:active { background: #9e3800; }
+
+    .error-msg {
+      background: #fee;
+      border: 1px solid #fcc;
+      color: #c44;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      margin-top: 8px;
+    }
+
+    /* ---- 結果カード ---- */
+    #result-card {
+      background: #FCF6E4;
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      display: none;
+    }
+    #result-card h2 {
+      font-size: 0.95rem;
+      font-weight: bold;
+      color: #3a2010;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid rgba(204,74,0,0.25);
+    }
+
+    .result-ratio-big {
+      text-align: center;
+      font-size: 3rem;
+      font-weight: bold;
+      color: #CC4A00;
+      margin: 8px 0 6px;
+      letter-spacing: 0.03em;
+    }
+    .result-instruction {
+      text-align: center;
+      font-size: 0.92rem;
+      color: #3a2010;
+      margin-bottom: 16px;
+      line-height: 1.7;
+    }
+    .result-instruction strong { color: #CC4A00; }
+
+    .volume-info {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .volume-chip {
+      flex: 1;
+      background: rgba(255,255,255,0.7);
+      border-radius: 8px;
+      padding: 8px 10px;
+      text-align: center;
+    }
+    .volume-chip .vol-label { font-size: 0.75rem; color: rgba(58,32,16,0.55); }
+    .volume-chip .vol-num { font-weight: bold; font-size: 0.95rem; color: #CC4A00; margin-top: 3px; }
+
+    .warning-box {
+      background: #fff8e1;
+      border: 1px solid #ffe082;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.88rem;
+      color: #5d4037;
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+    .warning-box.overflow {
+      background: #ffeef0;
+      border-color: #ffb3ba;
+      color: #c62828;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>はかるもん</h1>
+  <p>型のサイズを測って材料の倍率を計算</p>
+</header>
+
+<div class="container">
+
+  <!-- 型の種類タブ -->
+  <div class="type-tabs">
+    <button class="type-tab active" onclick="setType('round')">丸型</button>
+    <button class="type-tab" onclick="setType('square')">スクエア</button>
+    <button class="type-tab" onclick="setType('pound')">パウンド</button>
+    <button class="type-tab" onclick="setType('bread')">食パン</button>
+  </div>
+
+  <!-- レシピの型 -->
+  <div class="card">
+    <h2>① レシピの型</h2>
+    <div id="recipe-inputs"></div>
+  </div>
+
+  <!-- 自分の型 -->
+  <div class="card">
+    <h2>② 自分の型</h2>
+    <div id="mine-inputs"></div>
+  </div>
+
+  <button class="calc-btn" onclick="calculate()">倍率を計算する</button>
+  <div id="error-area"></div>
+
+  <!-- 結果 -->
+  <div id="result-card">
+    <h2>計算結果</h2>
+    <div class="result-ratio-big" id="result-ratio"></div>
+    <div class="result-instruction" id="result-instruction"></div>
+    <div class="volume-info">
+      <div class="volume-chip">
+        <div class="vol-label">レシピの型の体積</div>
+        <div class="vol-num" id="recipe-vol"></div>
+      </div>
+      <div class="volume-chip">
+        <div class="vol-label">自分の型の体積</div>
+        <div class="vol-num" id="mine-vol"></div>
+      </div>
+    </div>
+    <div id="warning-area"></div>
+  </div>
+
+</div>
+
+<script>
+  let currentType = 'round';
+
+  const state = {
+    round: {
+      recipe: { mode: 'gou', gou: '', cm: '', height: 6 },
+      mine:   { mode: 'gou', gou: '', cm: '', height: 6 }
+    },
+    square: {
+      recipe: { length: '', width: '', height: 5 },
+      mine:   { length: '', width: '', height: 5 }
+    },
+    pound: {
+      recipe: { length: '', width: 8, height: 6 },
+      mine:   { length: '', width: 8, height: 6 }
+    },
+    bread: {
+      recipe: { mode: 'kin', kin: '', length: '', width: '', height: '' },
+      mine:   { mode: 'kin', kin: '', length: '', width: '', height: '' }
+    }
+  };
+
+  const kinSizes = {
+    '1':   { length: 19.5, width: 9, height: 9 },
+    '1.5': { length: 23.5, width: 9, height: 9 },
+    '2':   { length: 27.5, width: 9, height: 9 }
+  };
+
+  /* ---- タブ切り替え ---- */
+  function setType(type) {
+    currentType = type;
+    const types = ['round', 'square', 'pound', 'bread'];
+    document.querySelectorAll('.type-tab').forEach((tab, i) => {
+      tab.classList.toggle('active', types[i] === type);
+    });
+    renderInputs();
+    document.getElementById('result-card').style.display = 'none';
+    document.getElementById('error-area').innerHTML = '';
+  }
+
+  /* ---- 入力レンダリング ---- */
+  function renderInputs() {
+    renderSide('recipe');
+    renderSide('mine');
+  }
+
+  function renderSide(side) {
+    const el = document.getElementById(side + '-inputs');
+    const s = state[currentType][side];
+
+    if (currentType === 'round') {
+      el.innerHTML = `
+        <div class="toggle-row">
+          <button class="toggle-btn${s.mode === 'gou' ? ' active' : ''}"
+            onclick="setRoundMode('${side}','gou')">号数で入力</button>
+          <button class="toggle-btn${s.mode === 'cm' ? ' active' : ''}"
+            onclick="setRoundMode('${side}','cm')">cmで入力</button>
+        </div>
+        ${s.mode === 'gou' ? `
+          <div class="input-row">
+            <label>号数</label>
+            <input type="number" placeholder="例：6" value="${s.gou}"
+              min="1" step="1"
+              oninput="onInput('${side}','gou',this.value)"
+              onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+            <span class="unit">号</span>
+          </div>
+          <div class="auto-hint" id="hint-${side}">${s.gou ? '= 直径 ' + (parseFloat(s.gou) * 3) + ' cm' : '例：6号 = 直径18cm'}</div>
+        ` : `
+          <div class="input-row">
+            <label>直径</label>
+            <input type="number" placeholder="例：18" value="${s.cm}"
+              min="1" step="0.5"
+              oninput="onInput('${side}','cm',this.value)"
+              onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+            <span class="unit">cm</span>
+          </div>
+        `}
+        <div class="input-row">
+          <label>高さ</label>
+          <input type="number" placeholder="6" value="${s.height}"
+            min="1" step="0.5"
+            oninput="onInput('${side}','height',this.value)"
+            onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+          <span class="unit">cm</span>
+        </div>`;
+
+    } else if (currentType === 'square') {
+      el.innerHTML = `
+        <div class="input-row">
+          <label>縦</label>
+          <input type="number" placeholder="例：18" value="${s.length}"
+            min="1" step="0.5"
+            oninput="onInput('${side}','length',this.value)"
+            onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+          <span class="unit">cm</span>
+        </div>
+        <div class="input-row">
+          <label>横</label>
+          <input type="number" placeholder="例：18" value="${s.width}"
+            min="1" step="0.5"
+            oninput="onInput('${side}','width',this.value)"
+            onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+          <span class="unit">cm</span>
+        </div>
+        <div class="input-row">
+          <label>高さ</label>
+          <input type="number" placeholder="5" value="${s.height}"
+            min="1" step="0.5"
+            oninput="onInput('${side}','height',this.value)"
+            onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+          <span class="unit">cm</span>
+        </div>`;
+
+    } else if (currentType === 'pound') {
+      el.innerHTML = `
+        <div class="input-row">
+          <label>長さ</label>
+          <input type="number" placeholder="例：17" value="${s.length}"
+            min="1" step="0.5"
+            oninput="onInput('${side}','length',this.value)"
+            onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+          <span class="unit">cm</span>
+        </div>
+        <div class="input-row">
+          <label>横幅</label>
+          <input type="number" placeholder="8" value="${s.width}"
+            min="1" step="0.5"
+            oninput="onInput('${side}','width',this.value)"
+            onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+          <span class="unit">cm</span>
+        </div>
+        <div class="input-row">
+          <label>高さ</label>
+          <input type="number" placeholder="6" value="${s.height}"
+            min="1" step="0.5"
+            oninput="onInput('${side}','height',this.value)"
+            onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+          <span class="unit">cm</span>
+        </div>`;
+
+    } else if (currentType === 'bread') {
+      const hasDims = s.mode === 'kin' ? !!s.kin : true;
+      el.innerHTML = `
+        <div class="toggle-row">
+          <button class="toggle-btn${s.mode === 'kin' ? ' active' : ''}"
+            onclick="setBreadMode('${side}','kin')">斤数で入力</button>
+          <button class="toggle-btn${s.mode === 'cm' ? ' active' : ''}"
+            onclick="setBreadMode('${side}','cm')">cmで入力</button>
+        </div>
+        ${s.mode === 'kin' ? `
+          <div class="input-row">
+            <label>斤数</label>
+            <select class="kin-select" onchange="setKin('${side}',this.value)">
+              <option value=""${!s.kin ? ' selected' : ''}>-- 選択してください --</option>
+              <option value="1"${s.kin === '1' ? ' selected' : ''}>1斤</option>
+              <option value="1.5"${s.kin === '1.5' ? ' selected' : ''}>1.5斤</option>
+              <option value="2"${s.kin === '2' ? ' selected' : ''}>2斤</option>
+            </select>
+          </div>
+          ${hasDims ? `
+            <div class="input-row">
+              <label>長さ</label>
+              <input type="number" value="${s.length}" min="1" step="0.5"
+                oninput="onInput('${side}','length',this.value)"
+                onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+              <span class="unit">cm</span>
+            </div>
+            <div class="input-row">
+              <label>横幅</label>
+              <input type="number" value="${s.width}" min="1" step="0.5"
+                oninput="onInput('${side}','width',this.value)"
+                onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+              <span class="unit">cm</span>
+            </div>
+            <div class="input-row">
+              <label>高さ</label>
+              <input type="number" value="${s.height}" min="1" step="0.5"
+                oninput="onInput('${side}','height',this.value)"
+                onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+              <span class="unit">cm</span>
+            </div>
+          ` : ''}
+        ` : `
+          <div class="input-row">
+            <label>長さ</label>
+            <input type="number" placeholder="例：20" value="${s.length}"
+              min="1" step="0.5"
+              oninput="onInput('${side}','length',this.value)"
+              onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+            <span class="unit">cm</span>
+          </div>
+          <div class="input-row">
+            <label>横幅</label>
+            <input type="number" placeholder="例：9" value="${s.width}"
+              min="1" step="0.5"
+              oninput="onInput('${side}','width',this.value)"
+              onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+            <span class="unit">cm</span>
+          </div>
+          <div class="input-row">
+            <label>高さ</label>
+            <input type="number" placeholder="例：9" value="${s.height}"
+              min="1" step="0.5"
+              oninput="onInput('${side}','height',this.value)"
+              onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+            <span class="unit">cm</span>
+          </div>
+        `}`;
+    }
+  }
+
+  /* ---- 状態更新 ---- */
+  function onInput(side, key, value) {
+    const parsed = value === '' ? '' : parseFloat(value);
+    state[currentType][side][key] = parsed;
+
+    if (currentType === 'round' && key === 'gou') {
+      const hint = document.getElementById('hint-' + side);
+      if (hint) {
+        const gou = parseFloat(value);
+        hint.textContent = gou > 0 ? '= 直径 ' + (gou * 3) + ' cm' : '例：6号 = 直径18cm';
+      }
+    }
+  }
+
+  function setRoundMode(side, mode) {
+    state.round[side].mode = mode;
+    renderSide(side);
+  }
+
+  function setBreadMode(side, mode) {
+    state.bread[side].mode = mode;
+    renderSide(side);
+  }
+
+  function setKin(side, kin) {
+    state.bread[side].kin = kin;
+    if (kin && kinSizes[kin]) {
+      const sz = kinSizes[kin];
+      state.bread[side].length = sz.length;
+      state.bread[side].width  = sz.width;
+      state.bread[side].height = sz.height;
+    } else {
+      state.bread[side].length = '';
+      state.bread[side].width  = '';
+      state.bread[side].height = '';
+    }
+    renderSide(side);
+  }
+
+  /* ---- 体積計算 ---- */
+  function getVolume(side) {
+    const s = state[currentType][side];
+    if (currentType === 'round') {
+      let d;
+      if (s.mode === 'gou') {
+        const gou = parseFloat(s.gou);
+        if (!gou || gou <= 0) return null;
+        d = gou * 3;
+      } else {
+        d = parseFloat(s.cm);
+        if (!d || d <= 0) return null;
+      }
+      const h = parseFloat(s.height);
+      if (!h || h <= 0) return null;
+      return Math.PI * Math.pow(d / 2, 2) * h;
+    } else {
+      const l = parseFloat(s.length);
+      const w = parseFloat(s.width);
+      const h = parseFloat(s.height);
+      if (!l || l <= 0 || !w || w <= 0 || !h || h <= 0) return null;
+      return l * w * h;
+    }
+  }
+
+  /* ---- 計算実行 ---- */
+  function calculate() {
+    const errorArea = document.getElementById('error-area');
+    errorArea.innerHTML = '';
+
+    const recipeVol = getVolume('recipe');
+    const mineVol   = getVolume('mine');
+
+    if (recipeVol === null) {
+      errorArea.innerHTML = '<div class="error-msg">レシピの型のサイズを入力してください。</div>';
+      return;
+    }
+    if (mineVol === null) {
+      errorArea.innerHTML = '<div class="error-msg">自分の型のサイズを入力してください。</div>';
+      return;
+    }
+
+    const ratio = mineVol / recipeVol;
+    const ratioStr = ratio.toFixed(2);
+
+    document.getElementById('result-ratio').textContent = '× ' + ratioStr;
+    document.getElementById('result-instruction').innerHTML =
+      `すべての材料に <strong>× ${ratioStr}</strong> をかけてください`;
+
+    document.getElementById('recipe-vol').textContent = Math.round(recipeVol) + ' cm³';
+    document.getElementById('mine-vol').textContent   = Math.round(mineVol)   + ' cm³';
+
+    let warning = '';
+    if (ratio >= 1.2) {
+      warning = '<div class="warning-box">⚠️ 型が大きめです。生地が少なくなります</div>';
+    } else if (ratio <= 0.6) {
+      warning = '<div class="warning-box overflow">⚠️ 生地が溢れる可能性があります。8割程度を目安にしてください</div>';
+    }
+    document.getElementById('warning-area').innerHTML = warning;
+
+    const rc = document.getElementById('result-card');
+    rc.style.display = 'block';
+    rc.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  /* ---- 初期化 ---- */
+  renderInputs();
+</script>
+
+</body>
+</html>
