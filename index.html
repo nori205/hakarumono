@@ -123,19 +123,19 @@
     }
     .memo-textarea:focus { outline: none; border-color: #C08261; }
 
-    /* ---- 材料プリセット ---- */
-    .preset-grid {
-      display: flex;
+    /* ---- 材料候補パネル ---- */
+    .ing-suggestions-panel {
+      display: none;
       flex-wrap: wrap;
       gap: 6px;
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid rgba(58,32,16,0.1);
+      padding: 8px 4px;
+      border-top: 1px solid rgba(58,32,16,0.08);
+      margin-bottom: 4px;
     }
-    .preset-btn {
+    .suggestion-chip {
       padding: 6px 12px;
       background: white;
-      border: 1.5px solid rgba(192,130,97,0.4);
+      border: 1.5px solid rgba(192,130,97,0.35);
       border-radius: 20px;
       font-size: 0.82rem;
       color: #3a2010;
@@ -143,10 +143,11 @@
       cursor: pointer;
       white-space: nowrap;
     }
-    .preset-btn:active, .preset-btn.used {
-      background: rgba(192,130,97,0.15);
+    .suggestion-chip.history {
+      background: rgba(192,130,97,0.1);
       border-color: #C08261;
     }
+    .suggestion-chip:active { background: #C08261; color: white; border-color: #C08261; }
 
     /* ---- トグルボタン ---- */
     .toggle-row { display: flex; gap: 4px; margin-bottom: 12px; }
@@ -583,7 +584,6 @@
     </div>
     <div id="ingredients-list"></div>
     <button class="add-ing-btn" onclick="addIngredient()">＋ 材料を追加</button>
-    <div class="preset-grid" id="preset-grid"></div>
   </div>
 
   <!-- 作り方メモ -->
@@ -953,59 +953,73 @@
     { name: '', amount: '', unit: 'g' },
     { name: '', amount: '', unit: 'g' },
   ];
-  let focusedIngIdx = null;
+  let activePanelIdx = null;
 
   function renderIngredients() {
     document.getElementById('ingredients-list').innerHTML = ingredients.map((ing, i) => `
-      <div class="ingredient-row">
-        <input class="ing-name" type="text" placeholder="例：薄力粉" value="${escHtml(ing.name)}"
-          oninput="ingredients[${i}].name = this.value; updatePresetGrid()"
-          onfocus="focusedIngIdx=${i}; setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
-        <input class="ing-amount" type="number" placeholder="100" value="${ing.amount}"
-          min="0" step="any"
-          oninput="ingredients[${i}].amount = this.value"
-          onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
-        <select class="ing-unit" onchange="ingredients[${i}].unit = this.value">
-          ${UNITS.map(u => `<option value="${u}"${ing.unit === u ? ' selected' : ''}>${u}</option>`).join('')}
-        </select>
-        <button class="ing-del" onclick="removeIngredient(${i})">×</button>
+      <div>
+        <div class="ingredient-row">
+          <input class="ing-name" type="text" placeholder="例：薄力粉" value="${escHtml(ing.name)}"
+            oninput="ingredients[${i}].name=this.value; showIngPanel(${i},this.value)"
+            onfocus="showIngPanel(${i},this.value); setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)"
+            onblur="setTimeout(hideIngPanel,200)">
+          <input class="ing-amount" type="number" placeholder="100" value="${ing.amount}"
+            min="0" step="any"
+            oninput="ingredients[${i}].amount=this.value"
+            onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+          <select class="ing-unit" onchange="ingredients[${i}].unit=this.value">
+            ${UNITS.map(u => `<option value="${u}"${ing.unit===u?' selected':''}>${u}</option>`).join('')}
+          </select>
+          <button class="ing-del" onclick="removeIngredient(${i})">×</button>
+        </div>
+        <div class="ing-suggestions-panel" id="ing-panel-${i}"></div>
       </div>
     `).join('');
-    updatePresetGrid();
   }
 
-  function updatePresetGrid() {
-    const usedNames = new Set(ingredients.map(i => i.name.trim()).filter(Boolean));
-    document.getElementById('preset-grid').innerHTML = PRESET_INGREDIENTS.map(name => `
-      <button class="preset-btn${usedNames.has(name) ? ' used' : ''}"
-        onmousedown="event.preventDefault()" onclick="selectPreset('${escHtml(name)}')">${name}</button>
+  function showIngPanel(idx, filterText) {
+    // 別の行のパネルを閉じる
+    if (activePanelIdx !== null && activePanelIdx !== idx) {
+      const prev = document.getElementById('ing-panel-' + activePanelIdx);
+      if (prev) prev.style.display = 'none';
+    }
+    activePanelIdx = idx;
+    const panel = document.getElementById('ing-panel-' + idx);
+    if (!panel) return;
+    const historySet = new Set(getHistory());
+    const f = (filterText || '').trim().toLowerCase();
+    const all = [...new Set([...getHistory(), ...PRESET_INGREDIENTS])];
+    const filtered = f ? all.filter(n => n.toLowerCase().includes(f)) : all;
+    if (filtered.length === 0) { panel.style.display = 'none'; return; }
+    panel.innerHTML = filtered.map(name => `
+      <button class="suggestion-chip${historySet.has(name) && !PRESET_INGREDIENTS.includes(name) ? ' history' : ''}"
+        onmousedown="event.preventDefault()"
+        onclick="selectIngredient(${idx},'${escHtml(name)}')">${name}</button>
     `).join('');
+    panel.style.display = 'flex';
   }
 
-  function selectPreset(name) {
-    let targetIdx;
-    if (focusedIngIdx !== null && focusedIngIdx < ingredients.length) {
-      targetIdx = focusedIngIdx;
-    } else {
-      const emptyIdx = ingredients.findIndex(i => !i.name.trim());
-      targetIdx = emptyIdx >= 0 ? emptyIdx : ingredients.length;
+  function hideIngPanel() {
+    if (activePanelIdx !== null) {
+      const panel = document.getElementById('ing-panel-' + activePanelIdx);
+      if (panel) panel.style.display = 'none';
+      activePanelIdx = null;
     }
-    if (targetIdx >= ingredients.length) {
-      ingredients.push({ name, amount: '', unit: 'g' });
-      renderIngredients();
-      focusedIngIdx = targetIdx;
-    } else {
-      ingredients[targetIdx].name = name;
-      const inputs = document.querySelectorAll('.ing-name');
-      if (inputs[targetIdx]) inputs[targetIdx].value = name;
-      updatePresetGrid();
-    }
-    // amount欄にフォーカスを移す
+  }
+
+  function selectIngredient(idx, name) {
+    ingredients[idx].name = name;
+    addToHistory(name);
+    const inputs = document.querySelectorAll('.ing-name');
+    if (inputs[idx]) inputs[idx].value = name;
+    hideIngPanel();
     setTimeout(() => {
       const amounts = document.querySelectorAll('.ing-amount');
-      if (amounts[targetIdx]) amounts[targetIdx].focus();
+      if (amounts[idx]) amounts[idx].focus();
     }, 50);
   }
+
+  function updatePresetGrid() {} // 互換性のため残す
 
   function addIngredient() {
     ingredients.push({ name: '', amount: '', unit: 'g' });
@@ -1013,12 +1027,12 @@
     setTimeout(() => {
       const inputs = document.querySelectorAll('.ing-name');
       const last = inputs[inputs.length - 1];
-      if (last) { last.focus(); focusedIngIdx = ingredients.length - 1; }
+      if (last) last.focus();
     }, 50);
   }
 
   function removeIngredient(i) {
-    if (ingredients.length > 1) { ingredients.splice(i, 1); focusedIngIdx = null; renderIngredients(); }
+    if (ingredients.length > 1) { ingredients.splice(i, 1); renderIngredients(); }
   }
 
   function escHtml(str) {
