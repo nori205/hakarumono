@@ -4,8 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>はかるもん</title>
+  <link rel="manifest" href="manifest.json">
   <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700&display=swap" rel="stylesheet">
-  <meta name="theme-color" content="#CC4A00">
+  <meta name="theme-color" content="#C08261">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="はかるもん">
@@ -14,20 +15,39 @@
 
     body {
       font-family: 'M PLUS Rounded 1c', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif;
-      background: #DDCBA0;
+      background: #F5F0E8;
       color: #3a2010;
       min-height: 100vh;
       padding-bottom: 40px;
     }
 
     header {
-      background: #CC4A00;
+      background: #C08261;
       color: white;
-      padding: 16px 20px;
-      text-align: center;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
     }
+    .header-title { text-align: center; flex: 1; }
     header h1 { font-size: 1.2rem; font-weight: bold; }
-    header p { font-size: 0.8rem; margin-top: 4px; opacity: 0.9; }
+    header p { font-size: 0.78rem; margin-top: 3px; opacity: 0.9; }
+    .header-left { display: flex; gap: 4px; flex-shrink: 0; }
+    .saved-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-family: inherit;
+      font-weight: bold;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .saved-btn:active { background: rgba(255,255,255,0.35); }
 
     .container { padding: 16px; max-width: 500px; margin: 0 auto; }
 
@@ -54,14 +74,11 @@
       font-family: inherit;
       line-height: 1.3;
     }
-    .type-tab.active {
-      background: #CC4A00;
-      color: white;
-    }
+    .type-tab.active { background: #C08261; color: white; }
 
     /* ---- カード ---- */
     .card {
-      background: #9CC6DB;
+      background: #E8F3F9;
       border-radius: 12px;
       padding: 16px;
       margin-bottom: 16px;
@@ -73,44 +90,57 @@
       color: #3a2010;
       margin-bottom: 12px;
       padding-bottom: 8px;
-      border-bottom: 2px solid rgba(58,32,16,0.2);
+      border-bottom: 2px solid rgba(58,32,16,0.15);
     }
 
-    /* ---- トグルボタン ---- */
-    .toggle-row {
-      display: flex;
-      gap: 4px;
-      margin-bottom: 12px;
+    /* ---- レシピ名 ---- */
+    .recipe-name-input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid rgba(58,32,16,0.2);
+      border-radius: 8px;
+      font-size: 1rem;
+      background: white;
+      font-family: inherit;
+      color: #3a2010;
     }
+    .recipe-name-input:focus { outline: none; border-color: #C08261; }
+
+    /* ---- メモ ---- */
+    .memo-textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 12px 14px;
+      border: 1px solid rgba(58,32,16,0.2);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      color: #3a2010;
+      background: white;
+      resize: vertical;
+      line-height: 1.6;
+    }
+    .memo-textarea:focus { outline: none; border-color: #C08261; }
+
+    /* ---- トグルボタン ---- */
+    .toggle-row { display: flex; gap: 4px; margin-bottom: 12px; }
     .toggle-btn {
       flex: 1;
       padding: 9px 4px;
-      border: 2px solid #CC4A00;
+      border: 2px solid #C08261;
       border-radius: 8px;
       font-size: 0.88rem;
       font-weight: bold;
       background: white;
-      color: #CC4A00;
+      color: #C08261;
       cursor: pointer;
       font-family: inherit;
     }
-    .toggle-btn.active {
-      background: #CC4A00;
-      color: white;
-    }
+    .toggle-btn.active { background: #C08261; color: white; }
 
     /* ---- 入力行 ---- */
-    .input-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-    .input-row label {
-      font-size: 0.88rem;
-      color: #3a2010;
-      flex: 0 0 52px;
-    }
+    .input-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .input-row label { font-size: 0.88rem; color: #3a2010; flex: 0 0 52px; }
     .input-row input[type="number"] {
       flex: 1;
       padding: 11px 12px;
@@ -122,15 +152,8 @@
       font-family: inherit;
       color: #3a2010;
     }
-    .input-row input[type="number"]:focus {
-      outline: none;
-      border-color: #CC4A00;
-    }
-    .input-row .unit {
-      font-size: 0.9rem;
-      color: #3a2010;
-      flex: 0 0 24px;
-    }
+    .input-row input[type="number"]:focus { outline: none; border-color: #C08261; }
+    .input-row .unit { font-size: 0.9rem; color: #3a2010; flex: 0 0 24px; }
 
     .auto-hint {
       font-size: 0.8rem;
@@ -153,18 +176,92 @@
       font-family: inherit;
       appearance: none;
       -webkit-appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23CC4A00'/>%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23C08261'/>%3C/svg%3E");
       background-repeat: no-repeat;
       background-position: right 12px center;
       cursor: pointer;
     }
-    .kin-select:focus { outline: none; border-color: #CC4A00; }
+    .kin-select:focus { outline: none; border-color: #C08261; }
+
+    /* ---- 材料入力 ---- */
+    .ingredient-header {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 4px;
+      padding: 0 2px;
+    }
+    .ingredient-header span { font-size: 0.75rem; color: rgba(58,32,16,0.5); }
+    .ingredient-row { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; }
+    .ing-name {
+      flex: 2;
+      padding: 10px 10px;
+      border: 1px solid rgba(58,32,16,0.2);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      background: white;
+      font-family: inherit;
+      color: #3a2010;
+      min-width: 0;
+    }
+    .ing-name:focus { outline: none; border-color: #C08261; }
+    .ing-amount {
+      flex: 1;
+      padding: 10px 8px;
+      border: 1px solid rgba(58,32,16,0.2);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      text-align: right;
+      background: white;
+      font-family: inherit;
+      color: #3a2010;
+      min-width: 0;
+    }
+    .ing-amount:focus { outline: none; border-color: #C08261; }
+    .ing-unit {
+      flex: 0 0 62px;
+      padding: 10px 4px;
+      border: 1px solid rgba(58,32,16,0.2);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      background: white;
+      color: #3a2010;
+      font-family: inherit;
+      appearance: none;
+      -webkit-appearance: none;
+      text-align: center;
+      cursor: pointer;
+    }
+    .ing-del {
+      flex: 0 0 28px;
+      width: 28px;
+      height: 36px;
+      border: none;
+      background: transparent;
+      color: #ccc;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+    }
+    .add-ing-btn {
+      width: 100%;
+      padding: 10px;
+      background: transparent;
+      border: 2px dashed rgba(192,130,97,0.4);
+      border-radius: 8px;
+      color: #C08261;
+      font-size: 0.9rem;
+      font-weight: bold;
+      cursor: pointer;
+      font-family: inherit;
+      margin-top: 2px;
+    }
 
     /* ---- 計算ボタン ---- */
     .calc-btn {
       width: 100%;
       padding: 14px;
-      background: #CC4A00;
+      background: #C08261;
       color: white;
       border: none;
       border-radius: 10px;
@@ -174,7 +271,7 @@
       letter-spacing: 0.05em;
       font-family: inherit;
     }
-    .calc-btn:active { background: #9e3800; }
+    .calc-btn:active { background: #a86e50; }
 
     .error-msg {
       background: #fee;
@@ -188,7 +285,7 @@
 
     /* ---- 結果カード ---- */
     #result-card {
-      background: #FCF6E4;
+      background: #FFFDF6;
       border-radius: 12px;
       padding: 16px;
       margin-top: 16px;
@@ -201,31 +298,26 @@
       color: #3a2010;
       margin-bottom: 12px;
       padding-bottom: 8px;
-      border-bottom: 2px solid rgba(204,74,0,0.25);
+      border-bottom: 2px solid rgba(192,130,97,0.2);
     }
-
-    .result-ratio-big {
-      text-align: center;
-      font-size: 3rem;
-      font-weight: bold;
-      color: #CC4A00;
-      margin: 8px 0 6px;
-      letter-spacing: 0.03em;
-    }
-    .result-instruction {
-      text-align: center;
-      font-size: 0.92rem;
-      color: #3a2010;
-      margin-bottom: 16px;
-      line-height: 1.7;
-    }
-    .result-instruction strong { color: #CC4A00; }
-
-    .volume-info {
+    .result-ing-row {
       display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: white;
+      border-radius: 8px;
+      margin-bottom: 6px;
     }
+    .result-ing-name { font-size: 0.9rem; color: #3a2010; }
+    .result-ing-val { font-size: 1rem; font-weight: bold; color: #C08261; }
+    .result-ratio-note {
+      text-align: center;
+      font-size: 0.8rem;
+      color: rgba(58,32,16,0.4);
+      margin: 4px 0 12px;
+    }
+    .volume-info { display: flex; gap: 8px; margin-bottom: 12px; }
     .volume-chip {
       flex: 1;
       background: rgba(255,255,255,0.7);
@@ -234,8 +326,7 @@
       text-align: center;
     }
     .volume-chip .vol-label { font-size: 0.75rem; color: rgba(58,32,16,0.55); }
-    .volume-chip .vol-num { font-weight: bold; font-size: 0.95rem; color: #CC4A00; margin-top: 3px; }
-
+    .volume-chip .vol-num { font-weight: bold; font-size: 0.95rem; color: #C08261; margin-top: 3px; }
     .warning-box {
       background: #fff8e1;
       border: 1px solid #ffe082;
@@ -246,18 +337,194 @@
       margin-top: 8px;
       line-height: 1.5;
     }
-    .warning-box.overflow {
-      background: #ffeef0;
-      border-color: #ffb3ba;
-      color: #c62828;
+    .warning-box.overflow { background: #ffeef0; border-color: #ffb3ba; color: #c62828; }
+
+    /* ---- 焼き時間 ---- */
+    .bake-result-box {
+      background: #FFFDF6;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-top: 10px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(192,130,97,0.25);
+    }
+    .bake-result-label {
+      font-size: 0.82rem;
+      color: rgba(58,32,16,0.55);
+      margin-bottom: 8px;
+    }
+    .bake-result-row {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+    .bake-result-num {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #C08261;
+    }
+    .bake-result-unit { font-size: 0.9rem; color: #3a2010; }
+    .bake-result-temp {
+      font-size: 0.88rem;
+      color: rgba(58,32,16,0.65);
+      margin-left: 10px;
+    }
+    .bake-disclaimer {
+      font-size: 0.75rem;
+      color: rgba(58,32,16,0.5);
+      margin-top: 10px;
+      line-height: 1.6;
+      padding: 8px 10px;
+      background: rgba(192,130,97,0.07);
+      border-radius: 6px;
+    }
+
+    /* ---- はかり単位 ---- */
+    .scale-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .scale-label { font-size: 0.82rem; color: rgba(58,32,16,0.6); flex-shrink: 0; }
+    .scale-btn {
+      padding: 5px 12px;
+      border: 1.5px solid #C08261;
+      border-radius: 20px;
+      background: white;
+      color: #C08261;
+      font-size: 0.82rem;
+      font-weight: bold;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .scale-btn.active { background: #C08261; color: white; }
+    .scale-note {
+      font-size: 0.78rem;
+      color: rgba(58,32,16,0.5);
+      line-height: 1.6;
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: rgba(58,32,16,0.04);
+      border-radius: 8px;
+    }
+
+    /* ---- 保存ボタン ---- */
+    .save-recipe-btn {
+      width: 100%;
+      padding: 12px;
+      background: white;
+      color: #C08261;
+      border: 2px solid #C08261;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      cursor: pointer;
+      font-family: inherit;
+      margin-top: 12px;
+    }
+    .save-recipe-btn:active { background: #fdf0e8; }
+    .save-recipe-btn:disabled { opacity: 0.5; cursor: default; }
+
+    /* ---- バックアップ ---- */
+    .backup-card {
+      background: white;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-top: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .backup-card h3 { font-size: 0.82rem; color: rgba(58,32,16,0.5); margin-bottom: 10px; }
+    .backup-btns { display: flex; gap: 8px; }
+    .backup-btn {
+      flex: 1;
+      padding: 10px 8px;
+      border: 1px solid rgba(58,32,16,0.18);
+      border-radius: 8px;
+      background: white;
+      color: #3a2010;
+      font-size: 0.85rem;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .backup-btn:active { background: #f5f0e8; }
+
+    /* ---- モーダル ---- */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 100;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .modal-sheet {
+      background: white;
+      border-radius: 20px 20px 0 0;
+      width: 100%;
+      max-width: 500px;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      flex-shrink: 0;
+    }
+    .modal-header h2 { font-size: 1rem; font-weight: bold; color: #3a2010; }
+    .modal-close {
+      border: none;
+      background: transparent;
+      font-size: 1.4rem;
+      color: #aaa;
+      cursor: pointer;
+      padding: 4px;
+      line-height: 1;
+    }
+    .modal-body { overflow-y: auto; padding: 16px; flex: 1; }
+    .saved-recipe-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      background: #f8f5f0;
+      border-radius: 10px;
+      margin-bottom: 8px;
+    }
+    .saved-recipe-info { flex: 1; cursor: pointer; }
+    .saved-recipe-name { font-size: 0.95rem; font-weight: bold; color: #3a2010; }
+    .saved-recipe-meta { font-size: 0.78rem; color: rgba(58,32,16,0.5); margin-top: 2px; }
+    .saved-recipe-del {
+      border: none;
+      background: transparent;
+      color: #ccc;
+      font-size: 0.8rem;
+      cursor: pointer;
+      padding: 6px;
+      flex-shrink: 0;
     }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>はかるもん</h1>
-  <p>型のサイズを測って材料の倍率を計算</p>
+  <div class="header-left">
+    <button class="saved-btn" onclick="exportBackup()">バックアップ</button>
+    <button class="saved-btn" onclick="importBackup()">復元</button>
+    <input type="file" id="import-file" accept=".json" style="display:none" onchange="onImportFile(event)">
+  </div>
+  <div class="header-title">
+    <h1>はかるもん</h1>
+    <p>レシピの型と手持ちの型を入力して材料を自動換算</p>
+  </div>
+  <button class="saved-btn" onclick="openSavedRecipes()">保存済み</button>
 </header>
 
 <div class="container">
@@ -270,26 +537,77 @@
     <button class="type-tab" onclick="setType('bread')">食パン</button>
   </div>
 
+  <!-- レシピ名 -->
+  <div class="card">
+    <h2>レシピ名</h2>
+    <input class="recipe-name-input" type="text" id="recipe-name"
+      placeholder="例：バナナパウンドケーキ"
+      onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+  </div>
+
+  <!-- レシピの材料 -->
+  <div class="card">
+    <h2>① レシピの材料</h2>
+    <div class="ingredient-header">
+      <span style="flex:2">材料名</span>
+      <span style="flex:1;text-align:right">分量</span>
+      <span style="flex:0 0 62px;text-align:center">単位</span>
+      <span style="flex:0 0 28px"></span>
+    </div>
+    <div id="ingredients-list"></div>
+    <button class="add-ing-btn" onclick="addIngredient()">＋ 材料を追加</button>
+  </div>
+
+  <!-- 作り方メモ -->
+  <div class="card">
+    <h2>作り方メモ</h2>
+    <textarea id="recipe-memo" class="memo-textarea" placeholder="手順や気をつけること、アレンジなど自由に"></textarea>
+  </div>
+
+  <!-- 焼き時間・温度 -->
+  <div class="card">
+    <h2>焼き時間・温度（任意）</h2>
+    <div class="input-row">
+      <label>焼き時間</label>
+      <input type="number" id="baking-time" placeholder="例：35" min="1" step="1"
+        onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+      <span class="unit">分</span>
+    </div>
+    <div class="input-row">
+      <label>温度</label>
+      <input type="number" id="baking-temp" placeholder="例：180" min="100" step="10"
+        onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+      <span class="unit">℃</span>
+    </div>
+    <p style="font-size:0.78rem;color:rgba(58,32,16,0.4);margin-top:4px;">入力すると、型サイズから焼き時間の目安を算出します</p>
+  </div>
+
   <!-- レシピの型 -->
   <div class="card">
-    <h2>① レシピの型</h2>
+    <h2>② レシピの型</h2>
     <div id="recipe-inputs"></div>
   </div>
 
   <!-- 自分の型 -->
   <div class="card">
-    <h2>② 自分の型</h2>
+    <h2>③ 自分の型</h2>
     <div id="mine-inputs"></div>
   </div>
 
-  <button class="calc-btn" onclick="calculate()">倍率を計算する</button>
+  <button class="calc-btn" onclick="calculate()">材料を換算する</button>
   <div id="error-area"></div>
 
   <!-- 結果 -->
   <div id="result-card">
-    <h2>計算結果</h2>
-    <div class="result-ratio-big" id="result-ratio"></div>
-    <div class="result-instruction" id="result-instruction"></div>
+    <h2>換算後の材料</h2>
+    <div class="scale-row">
+      <span class="scale-label">はかりの単位：</span>
+      <button class="scale-btn active" onclick="setScale(1)">1g</button>
+      <button class="scale-btn" onclick="setScale(0.5)">0.5g</button>
+      <button class="scale-btn" onclick="setScale(0.1)">0.1g</button>
+    </div>
+    <div id="result-ing-list"></div>
+    <div class="result-ratio-note" id="result-ratio-note"></div>
     <div class="volume-info">
       <div class="volume-chip">
         <div class="vol-label">レシピの型の体積</div>
@@ -300,9 +618,28 @@
         <div class="vol-num" id="mine-vol"></div>
       </div>
     </div>
+    <div id="bake-result-area"></div>
     <div id="warning-area"></div>
+    <div class="scale-note">※ はかりの単位より少ない量は「少々」と表示しています。全材料を同じ倍率で換算しているため、元レシピの比率は保たれています。塩・ベーキングパウダーなど少量の材料が「少々」になった場合も、ひとつまみ〜少量で問題ありません。</div>
+
+    <button class="save-recipe-btn" id="save-recipe-btn" onclick="saveRecipe()">このレシピを保存する</button>
   </div>
 
+
+</div>
+
+<!-- 材料名サジェスト -->
+<datalist id="ing-suggestions"></datalist>
+
+<!-- 保存済みレシピ モーダル -->
+<div class="modal-overlay" id="saved-modal" onclick="onModalOverlayClick(event)">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <h2>保存済みレシピ</h2>
+      <button class="modal-close" onclick="closeSavedRecipes()">×</button>
+    </div>
+    <div class="modal-body" id="saved-recipes-list"></div>
+  </div>
 </div>
 
 <script>
@@ -517,11 +854,8 @@
     }
   }
 
-  /* ---- 状態更新 ---- */
   function onInput(side, key, value) {
-    const parsed = value === '' ? '' : parseFloat(value);
-    state[currentType][side][key] = parsed;
-
+    state[currentType][side][key] = value === '' ? '' : parseFloat(value);
     if (currentType === 'round' && key === 'gou') {
       const hint = document.getElementById('hint-' + side);
       if (hint) {
@@ -531,15 +865,8 @@
     }
   }
 
-  function setRoundMode(side, mode) {
-    state.round[side].mode = mode;
-    renderSide(side);
-  }
-
-  function setBreadMode(side, mode) {
-    state.bread[side].mode = mode;
-    renderSide(side);
-  }
+  function setRoundMode(side, mode) { state.round[side].mode = mode; renderSide(side); }
+  function setBreadMode(side, mode) { state.bread[side].mode = mode; renderSide(side); }
 
   function setKin(side, kin) {
     state.bread[side].kin = kin;
@@ -556,7 +883,12 @@
     renderSide(side);
   }
 
-  /* ---- 体積計算 ---- */
+  /* ---- 体積・深さ計算 ---- */
+  function getHeight(side) {
+    const h = parseFloat(state[currentType][side].height);
+    return (h && h > 0) ? h : null;
+  }
+
   function getVolume(side) {
     const s = state[currentType][side];
     if (currentType === 'round') {
@@ -581,6 +913,100 @@
     }
   }
 
+  /* ---- 材料管理 ---- */
+  const PRESET_INGREDIENTS = [
+    '強力粉', '薄力粉', '米粉', '中力粉', 'コーンスターチ',
+    'ドライイースト', 'ベーキングパウダー', '重曹',
+    '塩', '砂糖', 'バター', 'サラダ油', 'ショートニング',
+    '牛乳', '水', '卵', '生クリーム',
+    'アーモンドプードル', 'バニラエッセンス', 'チョコレート'
+  ];
+  const UNITS = ['g', 'ml', '個', '大さじ', '小さじ', 'カップ', 'cc', '本', '枚'];
+
+  let ingredients = [
+    { name: '', amount: '', unit: 'g' },
+    { name: '', amount: '', unit: 'g' },
+    { name: '', amount: '', unit: 'g' },
+  ];
+
+  function renderIngredients() {
+    document.getElementById('ingredients-list').innerHTML = ingredients.map((ing, i) => `
+      <div class="ingredient-row">
+        <input class="ing-name" type="text" placeholder="例：薄力粉" value="${escHtml(ing.name)}"
+          list="ing-suggestions"
+          oninput="ingredients[${i}].name = this.value"
+          onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+        <input class="ing-amount" type="number" placeholder="100" value="${ing.amount}"
+          min="0" step="any"
+          oninput="ingredients[${i}].amount = this.value"
+          onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+        <select class="ing-unit" onchange="ingredients[${i}].unit = this.value">
+          ${UNITS.map(u => `<option value="${u}"${ing.unit === u ? ' selected' : ''}>${u}</option>`).join('')}
+        </select>
+        <button class="ing-del" onclick="removeIngredient(${i})">×</button>
+      </div>
+    `).join('');
+  }
+
+  function addIngredient() {
+    ingredients.push({ name: '', amount: '', unit: 'g' });
+    renderIngredients();
+  }
+
+  function removeIngredient(i) {
+    if (ingredients.length > 1) { ingredients.splice(i, 1); renderIngredients(); }
+  }
+
+  function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  let scaleUnit = 1;
+  let lastRatio = null;
+
+  function setScale(val) {
+    scaleUnit = val;
+    document.querySelectorAll('.scale-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.textContent === val + 'g');
+    });
+    if (lastRatio !== null) renderResults(lastRatio);
+  }
+
+  function formatAmount(val, unit) {
+    if (['g', 'ml', 'cc'].includes(unit)) {
+      const rounded = Math.round(val / scaleUnit) * scaleUnit;
+      if (rounded < scaleUnit) return '少々';
+      const decimals = scaleUnit < 1 ? (scaleUnit === 0.1 ? 1 : 1) : 0;
+      return rounded.toFixed(decimals).replace(/\.0$/, '');
+    }
+    if (['個', '本', '枚'].includes(unit)) {
+      const r = Math.round(val * 10) / 10;
+      if (r % 1 === 0) return r.toString();
+      return '約' + r.toFixed(1);
+    }
+    if (val >= 100) return Math.round(val).toString();
+    if (val >= 10)  return (Math.round(val * 10) / 10).toString();
+    return (Math.round(val * 100) / 100).toString();
+  }
+
+  /* ---- 履歴・サジェスト ---- */
+  function getHistory() {
+    try { return JSON.parse(localStorage.getItem('ing_history') || '[]'); } catch { return []; }
+  }
+
+  function addToHistory(name) {
+    if (!name.trim()) return;
+    let h = getHistory();
+    h = [name, ...h.filter(x => x !== name)].slice(0, 50);
+    localStorage.setItem('ing_history', JSON.stringify(h));
+  }
+
+  function updateDatalist() {
+    const all = [...new Set([...getHistory(), ...PRESET_INGREDIENTS])];
+    document.getElementById('ing-suggestions').innerHTML =
+      all.map(n => `<option value="${escHtml(n)}">`).join('');
+  }
+
   /* ---- 計算実行 ---- */
   function calculate() {
     const errorArea = document.getElementById('error-area');
@@ -599,30 +1025,210 @@
     }
 
     const ratio = mineVol / recipeVol;
-    const ratioStr = ratio.toFixed(2);
-
-    document.getElementById('result-ratio').textContent = '× ' + ratioStr;
-    document.getElementById('result-instruction').innerHTML =
-      `すべての材料に <strong>× ${ratioStr}</strong> をかけてください`;
-
+    lastRatio = ratio;
     document.getElementById('recipe-vol').textContent = Math.round(recipeVol) + ' cm³';
     document.getElementById('mine-vol').textContent   = Math.round(mineVol)   + ' cm³';
 
-    let warning = '';
-    if (ratio >= 1.2) {
-      warning = '<div class="warning-box">⚠️ 型が大きめです。生地が少なくなります</div>';
-    } else if (ratio <= 0.6) {
-      warning = '<div class="warning-box overflow">⚠️ 生地が溢れる可能性があります。8割程度を目安にしてください</div>';
-    }
-    document.getElementById('warning-area').innerHTML = warning;
+    const bakingTime = parseFloat(document.getElementById('baking-time').value);
+    const bakingTemp = parseFloat(document.getElementById('baking-temp').value);
+    const hRecipe = getHeight('recipe');
+    const hMine   = getHeight('mine');
+    renderResults(ratio, bakingTime, bakingTemp, hRecipe, hMine);
 
     const rc = document.getElementById('result-card');
     rc.style.display = 'block';
     rc.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
+  function renderResults(ratio, bakingTime, bakingTemp, hRecipe, hMine) {
+    const filled = ingredients.filter(ing => ing.name.trim() || ing.amount !== '');
+    let ingHtml = filled.length > 0 ? filled.map(ing => {
+      const orig = parseFloat(ing.amount);
+      if (isNaN(orig) || orig <= 0) {
+        return `<div class="result-ing-row">
+          <span class="result-ing-name">${escHtml(ing.name) || '（名前なし）'}</span>
+          <span class="result-ing-val" style="color:#bbb">分量未入力</span>
+        </div>`;
+      }
+      const adj = formatAmount(orig * ratio, ing.unit);
+      const unitLabel = adj === '少々' ? '' : ' ' + ing.unit;
+      return `<div class="result-ing-row">
+        <span class="result-ing-name">${escHtml(ing.name) || '（名前なし）'}</span>
+        <span class="result-ing-val">${adj}${unitLabel}</span>
+      </div>`;
+    }).join('') : `<div class="result-ing-row">
+      <span class="result-ing-name" style="color:#aaa">材料が未入力です</span>
+      <span class="result-ing-val" style="color:#aaa">×${ratio.toFixed(2)}</span>
+    </div>`;
+
+    document.getElementById('result-ing-list').innerHTML = ingHtml;
+    document.getElementById('result-ratio-note').textContent =
+      `倍率 ×${ratio.toFixed(2)}（自分の型はレシピの型より${ratio >= 1 ? '大きい' : '小さい'}）`;
+
+    // 焼き時間の目安
+    let bakeHtml = '';
+    if (!isNaN(bakingTime) && bakingTime > 0 && hRecipe && hMine) {
+      const depthRatio = hMine / hRecipe;
+      const newTime = Math.round(bakingTime * Math.sqrt(depthRatio));
+      const tempStr = (!isNaN(bakingTemp) && bakingTemp > 0)
+        ? `<span class="bake-result-temp">/ ${bakingTemp}℃${depthRatio > 1.2 ? '（深さが増すので10〜20℃下げてもOK）' : ''}</span>`
+        : '';
+      bakeHtml = `
+        <div class="bake-result-box">
+          <div class="bake-result-label">焼き時間の目安</div>
+          <div class="bake-result-row">
+            <span class="bake-result-num">約${newTime}</span>
+            <span class="bake-result-unit">分</span>
+            ${tempStr}
+          </div>
+          <div class="bake-disclaimer">※ この時間はあくまで計算上の目安です。実際の焼き時間はオーブンの機種・特性、生地の水分量、型の素材などによって異なります。竹串を刺して確認しながら、必ず様子を見て調整してください。</div>
+        </div>`;
+    }
+    document.getElementById('bake-result-area').innerHTML = bakeHtml;
+
+    let warning = '';
+    if (ratio >= 1.5) warning = '<div class="warning-box">型がかなり大きいです。生地が薄くなりすぎる可能性があります</div>';
+    else if (ratio <= 0.6) warning = '<div class="warning-box overflow">型が小さいため、生地が溢れる可能性があります。8割程度を目安にしてください</div>';
+    document.getElementById('warning-area').innerHTML = warning;
+  }
+
+  /* ---- レシピ保存・読み込み ---- */
+  function getSavedRecipes() {
+    try { return JSON.parse(localStorage.getItem('saved_recipes') || '[]'); } catch { return []; }
+  }
+
+  function saveRecipe() {
+    const name = document.getElementById('recipe-name').value.trim() || '名前なし';
+    const recipe = {
+      id: Date.now().toString(),
+      name,
+      memo: document.getElementById('recipe-memo').value,
+      bakingTime: document.getElementById('baking-time').value,
+      bakingTemp: document.getElementById('baking-temp').value,
+      moldType: currentType,
+      moldState: JSON.parse(JSON.stringify(state[currentType])),
+      ingredients: JSON.parse(JSON.stringify(ingredients.filter(i => i.name.trim()))),
+      savedAt: new Date().toLocaleDateString('ja-JP')
+    };
+    const recipes = getSavedRecipes();
+    recipes.unshift(recipe);
+    localStorage.setItem('saved_recipes', JSON.stringify(recipes));
+    ingredients.forEach(i => addToHistory(i.name));
+    updateDatalist();
+
+    const btn = document.getElementById('save-recipe-btn');
+    btn.textContent = '保存しました！';
+    btn.disabled = true;
+    setTimeout(() => { btn.textContent = 'このレシピを保存する'; btn.disabled = false; }, 2000);
+  }
+
+  function loadRecipe(id) {
+    const recipe = getSavedRecipes().find(r => r.id === id);
+    if (!recipe) return;
+    document.getElementById('recipe-name').value = recipe.name === '名前なし' ? '' : recipe.name;
+    document.getElementById('recipe-memo').value = recipe.memo || '';
+    document.getElementById('baking-time').value = recipe.bakingTime || '';
+    document.getElementById('baking-temp').value = recipe.bakingTemp || '';
+    setType(recipe.moldType);
+    Object.assign(state[recipe.moldType].recipe, recipe.moldState.recipe);
+    Object.assign(state[recipe.moldType].mine,   recipe.moldState.mine);
+    ingredients = recipe.ingredients.length > 0
+      ? recipe.ingredients
+      : [{ name: '', amount: '', unit: 'g' }];
+    renderInputs();
+    renderIngredients();
+    document.getElementById('result-card').style.display = 'none';
+    closeSavedRecipes();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function deleteRecipe(id) {
+    if (!confirm('このレシピを削除しますか？')) return;
+    localStorage.setItem('saved_recipes',
+      JSON.stringify(getSavedRecipes().filter(r => r.id !== id)));
+    renderSavedRecipesList();
+  }
+
+  /* ---- モーダル ---- */
+  function openSavedRecipes() {
+    renderSavedRecipesList();
+    document.getElementById('saved-modal').style.display = 'flex';
+  }
+
+  function closeSavedRecipes() {
+    document.getElementById('saved-modal').style.display = 'none';
+  }
+
+  function onModalOverlayClick(e) {
+    if (e.target === document.getElementById('saved-modal')) closeSavedRecipes();
+  }
+
+  function renderSavedRecipesList() {
+    const recipes = getSavedRecipes();
+    const list = document.getElementById('saved-recipes-list');
+    if (recipes.length === 0) {
+      list.innerHTML = '<p style="text-align:center;color:#aaa;padding:32px 0">保存済みのレシピがありません</p>';
+      return;
+    }
+    list.innerHTML = recipes.map(r => `
+      <div class="saved-recipe-item">
+        <div class="saved-recipe-info" onclick="loadRecipe('${r.id}')">
+          <div class="saved-recipe-name">${escHtml(r.name)}</div>
+          <div class="saved-recipe-meta">${r.savedAt} · ${r.ingredients.length}種の材料</div>
+        </div>
+        <button class="saved-recipe-del" onclick="deleteRecipe('${r.id}')">削除</button>
+      </div>
+    `).join('');
+  }
+
+  /* ---- バックアップ・復元 ---- */
+  function exportBackup() {
+    const data = {
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      saved_recipes: getSavedRecipes(),
+      ing_history: getHistory()
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'hakarumono_backup_' + new Date().toLocaleDateString('ja-JP').replace(/\//g, '-') + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function importBackup() {
+    document.getElementById('import-file').click();
+  }
+
+  function onImportFile(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (data.saved_recipes) localStorage.setItem('saved_recipes', JSON.stringify(data.saved_recipes));
+        if (data.ing_history)   localStorage.setItem('ing_history',   JSON.stringify(data.ing_history));
+        updateDatalist();
+        alert('復元しました。');
+      } catch {
+        alert('ファイルの読み込みに失敗しました。');
+      }
+      e.target.value = '';
+    };
+    reader.readAsText(file);
+  }
+
   /* ---- 初期化 ---- */
   renderInputs();
+  renderIngredients();
+  updateDatalist();
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
 </script>
 
 </body>
