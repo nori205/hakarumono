@@ -564,28 +564,26 @@
     <textarea id="recipe-memo" class="memo-textarea" placeholder="手順や気をつけること、アレンジなど自由に"></textarea>
   </div>
 
-  <!-- 焼き時間・温度 -->
-  <div class="card">
-    <h2>焼き時間・温度（任意）</h2>
-    <div class="input-row">
-      <label>焼き時間</label>
-      <input type="number" id="baking-time" placeholder="例：35" min="1" step="1"
-        onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
-      <span class="unit">分</span>
-    </div>
-    <div class="input-row">
-      <label>温度</label>
-      <input type="number" id="baking-temp" placeholder="例：180" min="100" step="10"
-        onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
-      <span class="unit">℃</span>
-    </div>
-    <p style="font-size:0.78rem;color:rgba(58,32,16,0.4);margin-top:4px;">入力すると、型サイズから焼き時間の目安を算出します</p>
-  </div>
-
   <!-- レシピの型 -->
   <div class="card">
     <h2>② レシピの型</h2>
     <div id="recipe-inputs"></div>
+    <div style="border-top:1px solid rgba(58,32,16,0.1);margin-top:12px;padding-top:12px;">
+      <p style="font-size:0.85rem;font-weight:bold;color:#3a2010;margin-bottom:10px;">レシピの焼き時間・温度（任意）</p>
+      <div class="input-row">
+        <label>焼き時間</label>
+        <input type="number" id="baking-time" placeholder="例：35" min="1" step="1"
+          onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+        <span class="unit">分</span>
+      </div>
+      <div class="input-row">
+        <label>温度</label>
+        <input type="number" id="baking-temp" placeholder="例：180" min="100" step="10"
+          onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+        <span class="unit">℃</span>
+      </div>
+      <p style="font-size:0.78rem;color:rgba(58,32,16,0.4);margin-top:4px;">入力すると、型サイズから焼き時間の目安を算出します</p>
+    </div>
   </div>
 
   <!-- 自分の型 -->
