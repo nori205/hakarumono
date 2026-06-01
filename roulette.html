@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>はかるもん モニター抽選</title>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'M PLUS Rounded 1c', sans-serif;
+      background: #F5F0E8;
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: #3a2010;
+    }
+
+    header {
+      background: #C08261;
+      color: white;
+      text-align: center;
+      padding: 18px 16px 14px;
+    }
+    header h1 { font-size: 1.5rem; font-weight: 800; letter-spacing: 0.04em; }
+    header p { font-size: 0.82rem; opacity: 0.88; margin-top: 4px; }
+
+    .main {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 12px 16px 48px;
+    }
+
+    .prize-info {
+      text-align: center;
+      margin-bottom: 16px;
+      font-size: 0.9rem;
+    }
+    .prize-badge {
+      display: inline-block;
+      background: #C08261;
+      color: white;
+      border-radius: 20px;
+      padding: 5px 18px;
+      font-weight: bold;
+      margin-right: 8px;
+    }
+
+    /* ---- ガチャガチャ機 ---- */
+    .machine-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .machine {
+      width: 180px;
+      position: relative;
+    }
+    @keyframes machineShake {
+      0%,100% { transform: translateX(0) rotate(0); }
+      15%      { transform: translateX(-6px) rotate(-2deg); }
+      30%      { transform: translateX(6px) rotate(2deg); }
+      45%      { transform: translateX(-5px) rotate(-1.5deg); }
+      60%      { transform: translateX(5px) rotate(1.5deg); }
+      75%      { transform: translateX(-3px) rotate(-1deg); }
+      90%      { transform: translateX(3px) rotate(1deg); }
+    }
+    .machine.shaking { animation: machineShake 0.5s ease; }
+
+    /* ---- ガチャ機デザイン ---- */
+    .machine {
+      position: relative;
+      width: 190px;
+      filter: drop-shadow(0 8px 24px rgba(0,0,0,0.35));
+    }
+    .machine-dome {
+      width: 190px;
+      height: 130px;
+      border-radius: 95px 95px 0 0;
+      background: radial-gradient(ellipse at 35% 30%,
+        rgba(255,255,255,0.35) 0%,
+        rgba(255,240,210,0.12) 60%,
+        rgba(200,160,100,0.08) 100%);
+      border: 3px solid rgba(255,240,200,0.55);
+      border-bottom: none;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 18px 22px 10px;
+      box-shadow: inset 0 0 30px rgba(255,255,255,0.08),
+                  inset -8px -8px 20px rgba(0,0,0,0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    .dome-shine {
+      position: absolute;
+      top: 12px; left: 20px;
+      width: 40px; height: 22px;
+      background: rgba(255,255,255,0.25);
+      border-radius: 50%;
+      transform: rotate(-30deg);
+      pointer-events: none;
+    }
+    .sweet-icon {
+      font-size: 1.2rem;
+      line-height: 1;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
+    }
+
+    .machine-neck {
+      width: 60px;
+      height: 14px;
+      background: linear-gradient(to bottom, #D4956A, #A0522D);
+      border-left: 3px solid rgba(255,220,170,0.4);
+      border-right: 3px solid rgba(255,220,170,0.4);
+      margin: 0 auto;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .machine-body {
+      width: 190px;
+      background: linear-gradient(to bottom, #C08261, #8B4513);
+      border: 3px solid rgba(255,220,170,0.35);
+      border-top: none;
+      border-radius: 0 0 22px 22px;
+      padding: 12px 16px 16px;
+      text-align: center;
+      box-shadow: inset 0 -3px 10px rgba(0,0,0,0.2);
+      position: relative;
+    }
+    .machine-handle {
+      position: absolute;
+      right: -28px;
+      top: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+    .handle-base {
+      width: 14px; height: 10px;
+      background: linear-gradient(to right, #E8C890, #C09050);
+      border-radius: 3px 3px 0 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .handle-arm {
+      width: 8px; height: 36px;
+      background: linear-gradient(to right, #E8C890, #C09050);
+      border-radius: 4px;
+      box-shadow: 2px 2px 4px rgba(0,0,0,0.25);
+    }
+    .handle-knob {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #F5E0A0, #C08840);
+      box-shadow: 0 3px 6px rgba(0,0,0,0.35);
+    }
+    .machine-coin-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .coin-slot {
+      width: 32px; height: 5px;
+      background: rgba(0,0,0,0.35);
+      border-radius: 3px;
+    }
+    .coin-label {
+      font-size: 0.62rem;
+      font-weight: bold;
+      letter-spacing: 0.1em;
+      color: rgba(255,240,200,0.7);
+    }
+    .machine-output {
+      width: 50px; height: 22px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 6px 6px 10px 10px;
+      margin: 0 auto;
+      border: 1px solid rgba(255,220,170,0.2);
+    }
+
+    /* ---- スイーツステージ ---- */
+    .capsule-stage {
+      position: relative;
+      height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 4px;
+    }
+    .sweet-drop {
+      position: absolute;
+      font-size: 3.8rem;
+      line-height: 1;
+      opacity: 0;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.2));
+    }
+    .cap-name {
+      position: absolute;
+      left: 50%; top: 50%;
+      transform: translate(-50%,-50%) scale(0);
+      font-size: 1rem;
+      font-weight: 800;
+      color: white;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      white-space: nowrap;
+      background: #C08261;
+      padding: 8px 16px;
+      border-radius: 30px;
+      transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+      pointer-events: none;
+      z-index: 5;
+    }
+    .flying-piece {
+      position: absolute;
+      font-size: 1.4rem;
+      line-height: 1;
+      pointer-events: none;
+      left: calc(50% - 14px);
+      top: calc(50% - 14px);
+    }
+    @keyframes pieceFly {
+      0%   { transform: translate(0,0) scale(1) rotate(0deg); opacity: 1; }
+      100% { transform: translate(var(--tx),var(--ty)) scale(0.2) rotate(var(--rot)); opacity: 0; }
+    }
+    @keyframes sweetShake {
+      0%,100% { transform: translateY(0) rotate(0deg) scale(1.1); }
+      25%      { transform: translateY(-4px) rotate(-12deg) scale(1.15); }
+      75%      { transform: translateY(-4px) rotate(12deg) scale(1.15); }
+    }
+
+    /* ---- ガチャボタン ---- */
+    .gacha-btn {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #C08261, #8B4513);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: 0 4px 18px rgba(139,69,19,0.5);
+      letter-spacing: 0.04em;
+      transition: transform 0.1s, box-shadow 0.1s;
+      margin-bottom: 20px;
+    }
+    .gacha-btn:active { transform: scale(0.96); box-shadow: 0 2px 8px rgba(139,69,19,0.3); }
+    .gacha-btn:disabled { opacity: 0.45; cursor: default; transform: none; }
+
+    /* ---- 途中の当選一覧 ---- */
+    .winners-list {
+      display: none;
+      background: #FFFDF6;
+      border-radius: 16px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+    .winners-list h3 { font-size: 0.82rem; color: rgba(58,32,16,0.55); margin-bottom: 8px; }
+    .winner-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 0;
+      font-size: 0.9rem;
+      color: #3a2010;
+      border-bottom: 1px solid rgba(58,32,16,0.07);
+    }
+    .winner-chip:last-child { border-bottom: none; }
+    .winner-chip-num {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: #C08261;
+      color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: bold; flex-shrink: 0;
+    }
+
+    /* ---- 最終画面 ---- */
+    .final-screen {
+      display: none;
+      text-align: center;
+      animation: finalIn 0.7s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes finalIn {
+      from { opacity: 0; transform: scale(0.88); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    .final-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 6px; color: #3a2010; }
+    .final-sub { font-size: 0.85rem; color: rgba(58,32,16,0.55); margin-bottom: 20px; }
+    .final-card {
+      background: #FFFDF6;
+      border-radius: 20px;
+      padding: 20px 20px 8px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+    .final-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(58,32,16,0.07);
+      font-size: 1rem;
+      font-weight: bold;
+      color: #3a2010;
+      text-align: left;
+    }
+    .final-row:last-child { border-bottom: none; }
+    .final-num {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; font-weight: 800;
+      flex-shrink: 0; color: white;
+    }
+    .dm-banner {
+      background: #C08261;
+      color: white;
+      border-radius: 50px;
+      padding: 14px 20px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      letter-spacing: 0.03em;
+    }
+
+    /* ---- 当選オーバーレイ ---- */
+    .winner-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    .winner-overlay.show { display: flex; }
+    .winner-card {
+      background: #FFFDF6;
+      border-radius: 24px;
+      padding: 32px 36px 28px;
+      text-align: center;
+      color: #3a2010;
+      max-width: 300px;
+      width: 90%;
+      animation: cardPop 0.45s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes cardPop {
+      from { transform: scale(0.5); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+    .confetti-row { font-size: 1.5rem; margin-bottom: 6px; }
+    .w-label { font-size: 0.82rem; color: rgba(58,32,16,0.5); }
+    .w-num { font-size: 2.4rem; font-weight: 800; color: #C08261; line-height: 1.1; }
+    .w-num-label { font-size: 0.85rem; }
+    .w-name {
+      font-size: 1.25rem; font-weight: 800;
+      margin: 12px 0 22px;
+      word-break: break-all;
+      color: #3a2010;
+    }
+    .w-next-btn {
+      background: linear-gradient(135deg, #C08261, #8B4513);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 12px 32px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    /* ---- 管理者パネル ---- */
+    .admin-toggle { text-align: right; margin-top: 8px; margin-bottom: 10px; }
+    .admin-toggle-btn {
+      background: white;
+      border: 1px solid rgba(58,32,16,0.2);
+      color: #3a2010;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .admin-panel {
+      display: none;
+      background: #FFFDF6;
+      border-radius: 16px;
+      padding: 16px;
+      font-size: 0.88rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      color: #3a2010;
+    }
+    .admin-panel h3 { font-size: 0.9rem; font-weight: bold; margin-bottom: 12px; color: #3a2010; }
+    .admin-panel label { display: block; font-size: 0.8rem; color: rgba(58,32,16,0.6); margin: 10px 0 4px; }
+    .admin-panel textarea {
+      width: 100%; min-height: 80px;
+      padding: 8px;
+      border: 1px solid rgba(58,32,16,0.2);
+      border-radius: 8px;
+      background: #F5F0E8;
+      color: #3a2010;
+      font-family: inherit; font-size: 0.85rem;
+      resize: vertical;
+    }
+    .admin-panel textarea::placeholder { color: rgba(58,32,16,0.35); }
+    .admin-apply-btn {
+      display: block; width: 100%;
+      margin-top: 12px; padding: 10px;
+      background: #C08261;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit; font-weight: bold; cursor: pointer;
+    }
+    .admin-status { font-size: 0.8rem; margin-top: 8px; color: rgba(58,32,16,0.6); }
+    .admin-note { font-size: 0.75rem; color: rgba(58,32,16,0.45); margin-top: 8px; line-height: 1.5; }
+    .csv-section { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(58,32,16,0.1); }
+    .csv-upload-btn, .csv-import-btn {
+      padding: 6px 12px;
+      background: #F5F0E8;
+      color: #3a2010;
+      border: 1px solid rgba(58,32,16,0.2);
+      border-radius: 6px;
+      font-size: 0.8rem; font-family: inherit; cursor: pointer;
+    }
+    .csv-import-btn { display: none; margin-left: 6px; }
+    #csv-col-select {
+      display: none; width: 100%; margin-top: 6px;
+      padding: 6px; border-radius: 6px;
+      background: #F5F0E8;
+      color: #3a2010;
+      border: 1px solid rgba(58,32,16,0.2);
+      font-family: inherit;
+    }
+    .csv-preview { font-size: 0.8rem; margin-top: 6px; color: rgba(58,32,16,0.6); }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🎰 モニター抽選</h1>
+  <p>はかるもん モニター当選者5名を発表します</p>
+</header>
+
+<div class="main">
+  <div class="prize-info">
+    <span class="prize-badge">5名当選</span>
+    <span id="prize-remain">残り 5枠</span>
+  </div>
+
+  <!-- ガチャガチャ機 -->
+  <div class="machine-wrap" id="machine-wrap">
+    <div class="machine" id="machine">
+      <div class="machine-dome" id="machine-dome">
+        <div class="dome-shine"></div>
+      </div>
+      <div class="machine-neck"></div>
+      <div class="machine-body">
+        <div class="machine-handle">
+          <div class="handle-base"></div>
+          <div class="handle-arm"></div>
+          <div class="handle-knob"></div>
+        </div>
+        <div class="machine-coin-row">
+          <div class="coin-slot"></div>
+          <span class="coin-label">COIN</span>
+        </div>
+        <div class="machine-output"></div>
+      </div>
+    </div>
+
+    <div class="capsule-stage" id="capsule-stage">
+      <div class="sweet-drop" id="sweet-drop"></div>
+      <div class="cap-name" id="cap-name"></div>
+    </div>
+  </div>
+
+  <button class="gacha-btn" id="spin-btn" onclick="spin()">🎰 ガチャを回す！</button>
+  <div id="all-done-msg" style="display:none;text-align:center;opacity:0.7;font-size:0.9rem;margin-bottom:16px;"></div>
+
+  <div class="winners-list" id="winners-list">
+    <h3>当選者</h3>
+    <div id="winners-chips"></div>
+  </div>
+
+  <!-- 最終画面 -->
+  <div class="final-screen" id="final-screen">
+    <div class="final-title">🎉 当選者発表！</div>
+    <div class="final-sub">以下の5名が当選しました</div>
+    <div class="final-card" id="final-winners"></div>
+    <div class="dm-banner">📩 Instagramで詳細をDMします</div>
+  </div>
+
+  <!-- 管理者 -->
+  <div class="admin-toggle">
+    <button class="admin-toggle-btn" onclick="toggleAdmin()">設定</button>
+  </div>
+  <div class="admin-panel" id="admin-panel">
+    <h3>⚙️ 抽選設定</h3>
+    <div class="csv-section">
+      <label>CSVから読み込み</label>
+      <button class="csv-upload-btn" onclick="document.getElementById('csv-file').click()">CSVを選択</button>
+      <button class="csv-import-btn" id="csv-import-btn" onclick="importCsvColumn()">この列を使う</button>
+      <input type="file" id="csv-file" accept=".csv" style="display:none" onchange="onCsvLoad(event)">
+      <select id="csv-col-select"></select>
+      <div class="csv-preview" id="csv-preview"></div>
+    </div>
+    <label>全応募者名（1行に1名）</label>
+    <textarea id="all-names" placeholder="@user1&#10;@user2&#10;..."></textarea>
+    <label>当選者5名（1行に1名・入力順に当選）</label>
+    <textarea id="winner-names" placeholder="@user1&#10;@user2&#10;..."></textarea>
+    <button class="admin-apply-btn" onclick="applySettings()">設定を適用する</button>
+    <div class="admin-status" id="admin-status"></div>
+    <p class="admin-note">※ 設定後は「設定」ボタンでこのパネルを閉じてからガチャを回してください。</p>
+  </div>
+</div>
+
+<!-- 当選オーバーレイ -->
+<div class="winner-overlay" id="winner-overlay">
+  <div class="winner-card">
+    <div class="confetti-row">🎊 🎉 🎊</div>
+    <div class="w-label">当選者</div>
+    <div class="w-num" id="overlay-num">1<span class="w-num-label">名目</span></div>
+    <div class="w-name" id="overlay-name"></div>
+    <button class="w-next-btn" id="w-next-btn" onclick="closeOverlay()">次の抽選へ</button>
+  </div>
+</div>
+
+<script>
+  const MAX_WINNERS = 5;
+  // パン・お菓子テイストのカラーパレット
+  const CAPSULE_COLORS = [
+    ['#C08261','#8B4513'],   // シナモン
+    ['#F5C518','#D4830A'],   // バター
+    ['#8FAF5A','#5A7A3A'],   // 抹茶
+    ['#E8A0A0','#C05858'],   // いちご
+    ['#D4956A','#A0522D'],   // キャラメル
+  ];
+  const NUM_COLORS = ['#C08261','#D4830A','#8FAF5A','#C05858','#A0522D'];
+  const DOME_COLORS = [
+    ['#C08261','#8B4513'],
+    ['#F5C518','#D4830A'],
+    ['#8FAF5A','#5A7A3A'],
+    ['#E8A0A0','#C05858'],
+    ['#D4956A','#A0522D'],
+    ['#F0D080','#C8A040'],
+    ['#A8C878','#6A8A48'],
+    ['#E8C090','#C09060'],
+  ];
+
+  let allNames = [];
+  let winnerOrder = [];
+  let decidedWinners = [];
+  let spinning = false;
+  let currentWinnerIndex = 0;
+
+  /* ---- ドームのスイーツ絵文字 ---- */
+  const SWEETS = ['🍞','🥐','🧁','🍰','🍪','🥖','🍩','🎂','🥧','🍫'];
+  function buildDome() {
+    const dome = document.getElementById('machine-dome');
+    const shine = dome.querySelector('.dome-shine');
+    dome.innerHTML = '';
+    if (shine) dome.appendChild(shine);
+    SWEETS.forEach(e => {
+      const d = document.createElement('div');
+      d.className = 'sweet-icon';
+      d.textContent = e;
+      dome.appendChild(d);
+    });
+  }
+
+  /* ---- リセット ---- */
+  function resetCapsule() {
+    const el = document.getElementById('sweet-drop');
+    el.style.cssText = 'opacity:0;';
+    el.textContent = '';
+    document.getElementById('cap-name').style.transform = 'translate(-50%,-50%) scale(0)';
+  }
+
+  /* ---- ガチャ実行 ---- */
+  function spin() {
+    if (spinning || currentWinnerIndex >= MAX_WINNERS) return;
+    spinning = true;
+    document.getElementById('spin-btn').disabled = true;
+
+    const targetName = winnerOrder[currentWinnerIndex];
+    const sweet = SWEETS[currentWinnerIndex % SWEETS.length];
+
+    // マシンを揺らす
+    const machine = document.getElementById('machine');
+    machine.classList.add('shaking');
+    setTimeout(() => machine.classList.remove('shaking'), 600);
+
+    // スイーツをセット
+    const drop = document.getElementById('sweet-drop');
+    const capName = document.getElementById('cap-name');
+    drop.textContent = sweet;
+    drop.style.cssText = 'opacity:0; transform:translateY(-100px); transition:none;';
+    capName.style.transform = 'translate(-50%,-50%) scale(0)';
+    capName.textContent = targetName;
+
+    // 落下
+    setTimeout(() => {
+      drop.style.transition = 'transform 0.6s cubic-bezier(0.34,1.56,0.64,1), opacity 0.25s';
+      drop.style.opacity = '1';
+      drop.style.transform = 'translateY(0) rotate(0deg) scale(1)';
+    }, 500);
+
+    // グルグル回転
+    setTimeout(() => {
+      drop.style.transition = 'none';
+      let angle = 0;
+      const iv = setInterval(() => {
+        angle += 20;
+        drop.style.transform = `rotate(${angle}deg) scale(1.1)`;
+        if (angle >= 720) {
+          clearInterval(iv);
+          drop.style.transform = 'rotate(0deg) scale(1.1)';
+          burstSweet(sweet, targetName);
+        }
+      }, 25);
+    }, 1200);
+  }
+
+  /* ---- スイーツがパカッと割れる ---- */
+  function burstSweet(sweet, name) {
+    const drop = document.getElementById('sweet-drop');
+    const capName = document.getElementById('cap-name');
+    const stage = document.getElementById('capsule-stage');
+
+    // ブルブル震える
+    drop.style.transition = 'none';
+    drop.style.animation = 'sweetShake 0.3s ease';
+
+    setTimeout(() => {
+      // 破裂：元のスイーツが消える
+      drop.style.transition = 'transform 0.25s ease, opacity 0.25s';
+      drop.style.transform = 'scale(1.5)';
+      drop.style.opacity = '0';
+
+      // 破片が飛び散る
+      for (let i = 0; i < 8; i++) {
+        const p = document.createElement('div');
+        p.className = 'flying-piece';
+        p.textContent = sweet;
+        const a = (i / 8) * 360;
+        const d = 55 + Math.random() * 35;
+        const tx = (Math.cos(a * Math.PI / 180) * d).toFixed(0) + 'px';
+        const ty = (Math.sin(a * Math.PI / 180) * d).toFixed(0) + 'px';
+        const rot = (Math.random() * 360).toFixed(0) + 'deg';
+        p.style.cssText = `left:calc(50% - 14px);top:calc(50% - 14px);
+          --tx:${tx};--ty:${ty};--rot:${rot};
+          animation:pieceFly 0.7s ease forwards ${(i * 0.03).toFixed(2)}s;`;
+        stage.appendChild(p);
+        setTimeout(() => p.remove(), 1000);
+      }
+
+      // 名前が出てくる
+      setTimeout(() => {
+        capName.style.transform = 'translate(-50%,-50%) scale(1)';
+      }, 180);
+
+    }, 300);
+
+    setTimeout(() => showWinnerOverlay(name), 1400);
+  }
+
+  /* ---- 当選オーバーレイ ---- */
+  function showWinnerOverlay(name) {
+    const num = currentWinnerIndex + 1;
+    document.getElementById('overlay-num').innerHTML =
+      `${num}<span class="w-num-label">名目</span>`;
+    document.getElementById('overlay-name').textContent = name;
+    document.getElementById('w-next-btn').textContent =
+      num < MAX_WINNERS ? '次の抽選へ' : '当選者を発表！';
+    document.getElementById('winner-overlay').classList.add('show');
+  }
+
+  function closeOverlay() {
+    document.getElementById('winner-overlay').classList.remove('show');
+    decidedWinners.push(winnerOrder[currentWinnerIndex]);
+    currentWinnerIndex++;
+    updateWinnersList();
+    updateRemain();
+
+    if (currentWinnerIndex >= MAX_WINNERS) {
+      showFinalScreen();
+    } else {
+      spinning = false;
+      const btn = document.getElementById('spin-btn');
+      btn.disabled = false;
+      btn.textContent = '🎰 次をガチャる！';
+      resetCapsule();
+    }
+  }
+
+  /* ---- 最終画面 ---- */
+  function showFinalScreen() {
+    document.getElementById('spin-btn').style.display = 'none';
+    document.getElementById('winners-list').style.display = 'none';
+    document.getElementById('machine-wrap').style.display = 'none';
+    document.getElementById('final-winners').innerHTML = decidedWinners.map((n, i) =>
+      `<div class="final-row">
+        <div class="final-num" style="background:${NUM_COLORS[i]}">${i + 1}</div>
+        <div>${escHtml(n)}</div>
+      </div>`
+    ).join('');
+    document.getElementById('final-screen').style.display = 'block';
+  }
+
+  /* ---- 途中の当選一覧 ---- */
+  function updateWinnersList() {
+    if (decidedWinners.length === 0) { document.getElementById('winners-list').style.display = 'none'; return; }
+    document.getElementById('winners-list').style.display = 'block';
+    document.getElementById('winners-chips').innerHTML = decidedWinners.map((n, i) =>
+      `<div class="winner-chip">
+        <span class="winner-chip-num">${i + 1}</span>${escHtml(n)}
+      </div>`
+    ).join('');
+  }
+
+  function updateRemain() {
+    const r = MAX_WINNERS - decidedWinners.length;
+    document.getElementById('prize-remain').textContent = r > 0 ? `残り ${r}枠` : '抽選完了';
+  }
+
+  /* ---- 管理者パネル ---- */
+  function toggleAdmin() {
+    const p = document.getElementById('admin-panel');
+    p.style.display = p.style.display === 'none' ? 'block' : 'none';
+  }
+
+  function applySettings() {
+    const names   = document.getElementById('all-names').value.trim().split('\n').map(s => s.trim()).filter(Boolean);
+    const winners = document.getElementById('winner-names').value.trim().split('\n').map(s => s.trim()).filter(Boolean);
+    const status  = document.getElementById('admin-status');
+    if (names.length < 2) { status.textContent = '応募者は2名以上入力してください'; return; }
+    if (winners.length !== MAX_WINNERS) { status.textContent = `当選者は${MAX_WINNERS}名入力してください（現在${winners.length}名）`; return; }
+    for (const w of winners) {
+      if (!names.includes(w)) { status.textContent = `「${w}」が応募者リストに見つかりません`; return; }
+    }
+    allNames = names; winnerOrder = winners;
+    decidedWinners = []; currentWinnerIndex = 0; spinning = false;
+
+    document.getElementById('spin-btn').style.display = 'block';
+    document.getElementById('spin-btn').disabled = false;
+    document.getElementById('spin-btn').textContent = '🎰 ガチャを回す！';
+    document.getElementById('all-done-msg').style.display = 'none';
+    document.getElementById('final-screen').style.display = 'none';
+    document.getElementById('winners-list').style.display = 'none';
+    document.getElementById('machine-wrap').style.display = 'flex';
+    document.getElementById('prize-remain').textContent = `残り ${MAX_WINNERS}枠`;
+    resetCapsule();
+    buildDome();
+    status.textContent = `設定完了！ 応募者${names.length}名、当選者${winners.length}名`;
+    setTimeout(() => { document.getElementById('admin-panel').style.display = 'none'; }, 1500);
+  }
+
+  /* ---- CSV ---- */
+  let csvRows = [];
+  function onCsvLoad(e) {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      csvRows = parseCsv(ev.target.result);
+      if (csvRows.length < 2) { document.getElementById('csv-preview').textContent = '読み込めませんでした'; return; }
+      const headers = csvRows[0];
+      const sel = document.getElementById('csv-col-select');
+      sel.innerHTML = '<option value="">列を選択</option>' +
+        headers.map((h, i) => `<option value="${i}">${h || '列' + (i+1)}</option>`).join('');
+      const auto = headers.findIndex(h => /threads|アカウント|名前|name/i.test(h));
+      if (auto >= 0) sel.value = auto;
+      sel.style.display = 'block';
+      document.getElementById('csv-import-btn').style.display = 'inline-block';
+      document.getElementById('csv-preview').textContent = `${csvRows.length - 1}件の回答を読み込みました`;
+    };
+    reader.readAsText(file, 'UTF-8'); e.target.value = '';
+  }
+  function importCsvColumn() {
+    const idx = parseInt(document.getElementById('csv-col-select').value);
+    if (isNaN(idx)) { document.getElementById('csv-preview').textContent = '列を選択してください'; return; }
+    const names = csvRows.slice(1).map(r => (r[idx] || '').trim()).filter(Boolean);
+    if (!names.length) { document.getElementById('csv-preview').textContent = 'この列にデータがありません'; return; }
+    document.getElementById('all-names').value = names.join('\n');
+    document.getElementById('csv-preview').textContent = `✓ ${names.length}名を読み込みました`;
+  }
+  function parseCsv(text) {
+    const rows = [], lines = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n');
+    for (const line of lines) {
+      if (!line.trim()) continue;
+      const row = []; let cur = '', inQ = false;
+      for (let i = 0; i < line.length; i++) {
+        const c = line[i];
+        if (c === '"') { if (inQ && line[i+1] === '"') { cur += '"'; i++; } else inQ = !inQ; }
+        else if (c === ',' && !inQ) { row.push(cur); cur = ''; }
+        else cur += c;
+      }
+      row.push(cur); rows.push(row);
+    }
+    return rows;
+  }
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  /* ---- 初期化 ---- */
+  buildDome();
+
+  // デモ用プリセット
+  document.getElementById('all-names').value = `@azu.cherry328\n@chemmy_0408\nmichi_colorful\n@ara_hana_okomepan\n@taxka.c\n@naru._.work\n@komekopan.tsugumi\n@akibofenkuraebuakiyan\n@negima1030`;
+  document.getElementById('winner-names').value = `@azu.cherry328\n@ara_hana_okomepan\n@naru._.work\n@komekopan.tsugumi\n@negima1030`;
+  applySettings();
+</script>
+</body>
+</html>
