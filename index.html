@@ -24,23 +24,23 @@
     header {
       background: #C08261;
       color: white;
-      padding: 14px 16px;
+      padding: 10px 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
+      gap: 6px;
     }
-    .header-title { text-align: center; flex: 1; }
-    header h1 { font-size: 1.2rem; font-weight: bold; }
-    header p { font-size: 0.78rem; margin-top: 3px; opacity: 0.9; }
+    .header-title { text-align: center; flex: 1; min-width: 0; }
+    header h1 { font-size: 1.1rem; font-weight: bold; white-space: nowrap; }
+    header p { font-size: 0.72rem; margin-top: 2px; opacity: 0.9; display: none; }
     .header-left { display: flex; gap: 4px; flex-shrink: 0; }
     .saved-btn {
       background: rgba(255,255,255,0.2);
       border: none;
       color: white;
-      padding: 7px 10px;
+      padding: 6px 8px;
       border-radius: 8px;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       font-family: inherit;
       font-weight: bold;
       cursor: pointer;
@@ -83,6 +83,7 @@
       padding: 16px;
       margin-bottom: 16px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      overflow: hidden;
     }
     .card h2 {
       font-size: 0.95rem;
@@ -140,10 +141,11 @@
 
     /* ---- 入力行 ---- */
     .input-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-    .input-row label { font-size: 0.88rem; color: #3a2010; flex: 0 0 52px; }
+    .input-row label { font-size: 0.85rem; color: #3a2010; flex: 0 0 64px; }
     .input-row input[type="number"] {
       flex: 1;
-      padding: 11px 12px;
+      min-width: 0;
+      padding: 11px 10px;
       border: 1px solid rgba(58,32,16,0.2);
       border-radius: 8px;
       font-size: 1rem;
