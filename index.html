@@ -63,10 +63,10 @@
     }
     .type-tab {
       flex: 1;
-      padding: 10px 2px;
+      padding: 9px 1px;
       border: none;
       border-radius: 8px;
-      font-size: 0.8rem;
+      font-size: 0.72rem;
       font-weight: bold;
       background: transparent;
       color: #aaa;
@@ -657,6 +657,7 @@
   <!-- 型の種類タブ -->
   <div class="type-tabs">
     <button class="type-tab active" onclick="setType('round')">丸型</button>
+    <button class="type-tab" onclick="setType('chiffon')">シフォン</button>
     <button class="type-tab" onclick="setType('square')">スクエア</button>
     <button class="type-tab" onclick="setType('pound')">パウンド</button>
     <button class="type-tab" onclick="setType('bread')">食パン</button>
@@ -787,6 +788,10 @@
       recipe: { mode: 'gou', gou: '', cm: '', height: 6 },
       mine:   { mode: 'gou', gou: '', cm: '', height: 6 }
     },
+    chiffon: {
+      recipe: { outer: '', inner: '', height: '' },
+      mine:   { outer: '', inner: '', height: '' }
+    },
     square: {
       recipe: { length: '', width: '', height: 5 },
       mine:   { length: '', width: '', height: 5 }
@@ -801,6 +806,12 @@
     }
   };
 
+  const chiffonSizes = {
+    '15': { outer: 15, inner: 5,   height: 8 },
+    '17': { outer: 17, inner: 5.5, height: 9 },
+    '20': { outer: 20, inner: 6,   height: 10 }
+  };
+
   const kinSizes = {
     '1':   { length: 19.5, width: 9, height: 9 },
     '1.5': { length: 23.5, width: 9, height: 9 },
@@ -810,7 +821,7 @@
   /* ---- タブ切り替え ---- */
   function setType(type) {
     currentType = type;
-    const types = ['round', 'square', 'pound', 'bread'];
+    const types = ['round', 'chiffon', 'square', 'pound', 'bread'];
     document.querySelectorAll('.type-tab').forEach((tab, i) => {
       tab.classList.toggle('active', types[i] === type);
     });
@@ -860,6 +871,42 @@
         <div class="input-row">
           <label>高さ</label>
           <input type="number" placeholder="6" value="${s.height}"
+            min="1" step="0.5"
+            oninput="onInput('${side}','height',this.value)"
+            onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+          <span class="unit">cm</span>
+        </div>`;
+
+    } else if (currentType === 'chiffon') {
+      el.innerHTML = `
+        <div class="toggle-row">
+          <button class="toggle-btn${!s.outer ? ' active' : ''}" style="font-size:0.8rem"
+            onclick="setChiffonPreset('${side}','15')">15cm</button>
+          <button class="toggle-btn" style="font-size:0.8rem"
+            onclick="setChiffonPreset('${side}','17')">17cm</button>
+          <button class="toggle-btn" style="font-size:0.8rem"
+            onclick="setChiffonPreset('${side}','20')">20cm</button>
+        </div>
+        <div class="auto-hint" style="text-align:left;padding:0 0 8px 0">サイズを選ぶか、直接入力してください</div>
+        <div class="input-row">
+          <label>外径</label>
+          <input type="number" placeholder="例：17" value="${s.outer}"
+            min="1" step="0.5"
+            oninput="onInput('${side}','outer',this.value)"
+            onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+          <span class="unit">cm</span>
+        </div>
+        <div class="input-row">
+          <label>筒径</label>
+          <input type="number" placeholder="例：5.5" value="${s.inner}"
+            min="1" step="0.5"
+            oninput="onInput('${side}','inner',this.value)"
+            onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+          <span class="unit">cm</span>
+        </div>
+        <div class="input-row">
+          <label>高さ</label>
+          <input type="number" placeholder="例：9" value="${s.height}"
             min="1" step="0.5"
             oninput="onInput('${side}','height',this.value)"
             onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
@@ -1004,6 +1051,14 @@
 
   function setRoundMode(side, mode) { state.round[side].mode = mode; renderSide(side); }
   function setBreadMode(side, mode) { state.bread[side].mode = mode; renderSide(side); }
+  function setChiffonPreset(side, size) {
+    const sz = chiffonSizes[size];
+    if (!sz) return;
+    state.chiffon[side].outer  = sz.outer;
+    state.chiffon[side].inner  = sz.inner;
+    state.chiffon[side].height = sz.height;
+    renderSide(side);
+  }
 
   function setKin(side, kin) {
     state.bread[side].kin = kin;
@@ -1041,6 +1096,13 @@
       const h = parseFloat(s.height);
       if (!h || h <= 0) return null;
       return Math.PI * Math.pow(d / 2, 2) * h;
+    } else if (currentType === 'chiffon') {
+      const outer = parseFloat(s.outer);
+      const inner = parseFloat(s.inner);
+      const h     = parseFloat(s.height);
+      if (!outer || outer <= 0 || !inner || inner <= 0 || !h || h <= 0) return null;
+      if (inner >= outer) return null;
+      return Math.PI * (Math.pow(outer / 2, 2) - Math.pow(inner / 2, 2)) * h;
     } else {
       const l = parseFloat(s.length);
       const w = parseFloat(s.width);
@@ -1286,6 +1348,8 @@
     if (moldType === 'round') {
       if (s.mode === 'gou' && s.gou) return s.gou + '号（直径' + (s.gou * 3) + 'cm）';
       if (s.mode === 'cm' && s.cm) return '直径' + s.cm + 'cm';
+    } else if (moldType === 'chiffon') {
+      if (s.outer) return 'シフォン' + s.outer + 'cm（筒' + s.inner + 'cm）';
     } else if (moldType === 'square' || moldType === 'pound') {
       const p = [s.length && s.length + 'cm', s.width && s.width + 'cm', s.height && s.height + 'cm'].filter(Boolean);
       return p.join(' × ');
