@@ -897,13 +897,14 @@
           <span class="unit">cm</span>
         </div>
         <div class="input-row">
-          <label>筒径</label>
+          <label>穴径</label>
           <input type="number" placeholder="例：5.5" value="${s.inner}"
             min="1" step="0.5"
             oninput="onInput('${side}','inner',this.value)"
             onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
           <span class="unit">cm</span>
         </div>
+        <div class="auto-hint" style="text-align:left;padding:0 0 4px 0">外径＝型の外側の直径 / 穴径＝真ん中の穴の直径</div>
         <div class="input-row">
           <label>高さ</label>
           <input type="number" placeholder="例：9" value="${s.height}"
@@ -1349,7 +1350,7 @@
       if (s.mode === 'gou' && s.gou) return s.gou + '号（直径' + (s.gou * 3) + 'cm）';
       if (s.mode === 'cm' && s.cm) return '直径' + s.cm + 'cm';
     } else if (moldType === 'chiffon') {
-      if (s.outer) return 'シフォン' + s.outer + 'cm（筒' + s.inner + 'cm）';
+      if (s.outer) return 'シフォン' + s.outer + 'cm（穴' + s.inner + 'cm）';
     } else if (moldType === 'square' || moldType === 'pound') {
       const p = [s.length && s.length + 'cm', s.width && s.width + 'cm', s.height && s.height + 'cm'].filter(Boolean);
       return p.join(' × ');
