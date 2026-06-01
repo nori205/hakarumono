@@ -365,7 +365,7 @@
       margin-top: 8px;
       line-height: 1.5;
     }
-    .warning-box.overflow { background: #ffeef0; border-color: #ffb3ba; color: #c62828; }
+
 
     /* ---- 焼き時間 ---- */
     .bake-result-box {
@@ -1155,14 +1155,13 @@
             <span class="bake-result-unit">分</span>
             ${tempStr}
           </div>
-          <div class="bake-disclaimer">※ この時間はあくまで計算上の目安です。実際の焼き時間はオーブンの機種・特性、生地の水分量、型の素材などによって異なります。竹串を刺して確認しながら、必ず様子を見て調整してください。</div>
+          <div class="bake-disclaimer">※ この時間はあくまで計算上の目安です。実際の焼き時間はオーブンの機種・特性、生地の水分量、型の素材などによって異なります。竹串を刺して確認しながら、必ず様子を見て調整してください。${ratio > 1 ? '<br>型が大きくなる場合は特に焼き時間が変わりやすいため、早めに焼き加減を確認してください。' : ''}</div>
         </div>`;
     }
     document.getElementById('bake-result-area').innerHTML = bakeHtml;
 
     let warning = '';
-    if (ratio >= 1.5) warning = '<div class="warning-box">型がかなり大きいです。生地が薄くなりすぎる可能性があります</div>';
-    else if (ratio <= 0.6) warning = '<div class="warning-box overflow">型が小さいため、生地が溢れる可能性があります。8割程度を目安にしてください</div>';
+    if (ratio >= 1.5) warning = '<div class="warning-box">型がかなり大きいです。焼き時間が大幅に変わる場合があります。焼き時間の目安を参考に調整してください。</div>';
     document.getElementById('warning-area').innerHTML = warning;
   }
 
