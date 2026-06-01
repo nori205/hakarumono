@@ -961,13 +961,14 @@
 
   let scaleUnit = 1;
   let lastRatio = null;
+  let lastBakingTime = NaN, lastBakingTemp = NaN, lastHRecipe = null, lastHMine = null;
 
   function setScale(val) {
     scaleUnit = val;
     document.querySelectorAll('.scale-btn').forEach(btn => {
       btn.classList.toggle('active', btn.textContent === val + 'g');
     });
-    if (lastRatio !== null) renderResults(lastRatio);
+    if (lastRatio !== null) renderResults(lastRatio, lastBakingTime, lastBakingTemp, lastHRecipe, lastHMine);
   }
 
   function formatAmount(val, unit) {
@@ -1027,11 +1028,11 @@
     document.getElementById('recipe-vol').textContent = Math.round(recipeVol) + ' cm³';
     document.getElementById('mine-vol').textContent   = Math.round(mineVol)   + ' cm³';
 
-    const bakingTime = parseFloat(document.getElementById('baking-time').value);
-    const bakingTemp = parseFloat(document.getElementById('baking-temp').value);
-    const hRecipe = getHeight('recipe');
-    const hMine   = getHeight('mine');
-    renderResults(ratio, bakingTime, bakingTemp, hRecipe, hMine);
+    lastBakingTime = parseFloat(document.getElementById('baking-time').value);
+    lastBakingTemp = parseFloat(document.getElementById('baking-temp').value);
+    lastHRecipe = getHeight('recipe');
+    lastHMine   = getHeight('mine');
+    renderResults(ratio, lastBakingTime, lastBakingTemp, lastHRecipe, lastHMine);
 
     const rc = document.getElementById('result-card');
     rc.style.display = 'block';
