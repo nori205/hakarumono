@@ -233,11 +233,34 @@
   let decidedWinners = [];
   let wheelAngle     = 0;
   let spinning       = false;
-  let pointerDip     = 0; // 矢が刺さる量（正＝ホイール内側へ）
+
+  // 矢のバネ物理（pivot=矢の根元、角度で左右に揺れる）
+  let arrowAngle = 0;  // 現在の傾き（度）+ = 右、- = 左
+  let arrowVel   = 0;  // 角速度（度/フレーム）
+  const SPRING_K = 0.20;  // バネ強さ
+  const SPRING_B = 0.14;  // 減衰
 
   const canvas = document.getElementById('wheel-canvas');
   const ctx    = canvas.getContext('2d');
   const D2R    = Math.PI / 180;
+
+  // 矢の寸法
+  const AHH = 26, AHW = 22; // 矢頭 高・幅
+  const ABH = 26, ABW = 10; // シャフト 高・幅
+  const A_TOTAL = AHH + ABH; // 合計高さ=52px
+  // pivot(根元) の座標：キャンバス上部に固定
+  const PIVOT_X = CX;
+  const PIVOT_Y = CY - R - 4 - A_TOTAL; // = 202-142-4-52 = 4px
+
+  /* ---- バネ物理更新 ---- */
+  function updateArrow() {
+    const acc  = -SPRING_K * arrowAngle - SPRING_B * arrowVel;
+    arrowVel  += acc;
+    arrowAngle += arrowVel;
+    if (Math.abs(arrowAngle) < 0.05 && Math.abs(arrowVel) < 0.05) {
+      arrowAngle = 0; arrowVel = 0;
+    }
+  }
 
   /* ---- ポインター位置のセグメントを返す ---- */
   function getSegAtPointer(angle) {
@@ -246,7 +269,7 @@
   }
 
   /* ---- 全体描画 ---- */
-  function drawScene(angle, dip, flashSeg, flashA) {
+  function drawScene(angle, flashSeg, flashA) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // === ホイール（回転）===
@@ -259,7 +282,6 @@
       const eA = ((i + 1) * SEG_DEG - 90) * D2R;
       const mA = ((i + 0.5) * SEG_DEG - 90) * D2R;
 
-      // セグメント
       ctx.beginPath();
       ctx.moveTo(0, 0);
       ctx.arc(0, 0, R, sA, eA);
@@ -270,7 +292,6 @@
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // 番号テキスト
       const tR = R * 0.69;
       ctx.save();
       ctx.translate(Math.cos(mA) * tR, Math.sin(mA) * tR);
@@ -292,9 +313,8 @@
       ctx.moveTo(0, 0);
       ctx.arc(0, 0, R, sA, eA);
       ctx.closePath();
-      ctx.fillStyle = `rgba(255,245,170,${flashA})`;
+      ctx.fillStyle = `rgba(255,245,140,${flashA})`;
       ctx.fill();
-      // 番号を上書き（明確に見えるよう）
       const tR = R * 0.69;
       ctx.save();
       ctx.translate(Math.cos(mA) * tR, Math.sin(mA) * tR);
@@ -313,8 +333,6 @@
     ctx.strokeStyle = '#5a2c0a';
     ctx.lineWidth = 9;
     ctx.stroke();
-
-    // 外枠ハイライト
     ctx.beginPath();
     ctx.arc(0, 0, R + 6, 0, Math.PI * 2);
     ctx.strokeStyle = 'rgba(255,240,200,0.28)';
@@ -332,54 +350,78 @@
 
     ctx.restore();
 
-    // === 矢（固定・回転しない）===
-    // dip が大きいほど先端がホイール内側に入る
-    const tipY = CY - R - 4 + dip;
-    drawArrow(CX, tipY);
+    // === 矢（pivot中心に回転）===
+    drawArrow();
   }
 
-  /* ---- 矢（ポインター）描画 ---- */
-  function drawArrow(x, tipY) {
-    const hH = 28; // 矢頭の高さ
-    const hW = 24; // 矢頭の幅
-    const bH = 28; // シャフト高さ
-    const bW = 10; // シャフト幅
-
+  /* ---- 矢（ポインター）描画　赤×金の2トーン ---- */
+  function drawArrow() {
     ctx.save();
-    ctx.shadowColor = 'rgba(0,0,0,0.4)';
-    ctx.shadowBlur  = 8;
-    ctx.shadowOffsetY = 2;
+    // pivot点を中心に arrowAngle 度回転
+    ctx.translate(PIVOT_X, PIVOT_Y);
+    ctx.rotate(arrowAngle * D2R);
 
-    // 矢の輪郭
+    ctx.shadowColor = 'rgba(0,0,0,0.45)';
+    ctx.shadowBlur  = 10;
+    ctx.shadowOffsetX = 2;
+    ctx.shadowOffsetY = 3;
+
+    // ── シャフト（金色）──
+    const shaftGrad = ctx.createLinearGradient(-ABW / 2, 0, ABW / 2, 0);
+    shaftGrad.addColorStop(0,    '#B07800');
+    shaftGrad.addColorStop(0.35, '#FFD428');
+    shaftGrad.addColorStop(0.65, '#FFE860');
+    shaftGrad.addColorStop(1,    '#B07800');
+    ctx.fillStyle = shaftGrad;
     ctx.beginPath();
-    ctx.moveTo(x,          tipY);              // 先端（下）
-    ctx.lineTo(x + hW / 2, tipY - hH);        // 矢頭 右
-    ctx.lineTo(x + bW / 2, tipY - hH);        // シャフト右 開始
-    ctx.lineTo(x + bW / 2, tipY - hH - bH);   // シャフト右 上
-    ctx.lineTo(x - bW / 2, tipY - hH - bH);   // シャフト左 上
-    ctx.lineTo(x - bW / 2, tipY - hH);        // シャフト左 開始
-    ctx.lineTo(x - hW / 2, tipY - hH);        // 矢頭 左
-    ctx.closePath();
-
-    // グラデーション塗り
-    const grad = ctx.createLinearGradient(x - hW / 2, 0, x + hW / 2, 0);
-    grad.addColorStop(0,   '#D4B896');
-    grad.addColorStop(0.5, '#F5EAD0');
-    grad.addColorStop(1,   '#C4A880');
-    ctx.fillStyle = grad;
+    ctx.rect(-ABW / 2, 0, ABW, ABH);
     ctx.fill();
-
     ctx.shadowBlur = 0;
-    ctx.strokeStyle = '#5a2c0a';
-    ctx.lineWidth = 2.5;
+    ctx.strokeStyle = '#806000';
+    ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // 中心ライン（矢らしさ演出）
-    ctx.strokeStyle = 'rgba(90,44,10,0.25)';
+    // ── 矢頭（赤）──
+    ctx.shadowColor = 'rgba(0,0,0,0.35)';
+    ctx.shadowBlur  = 6;
+    ctx.shadowOffsetY = 2;
+    const headGrad = ctx.createLinearGradient(-AHW / 2, ABH, AHW / 2, ABH);
+    headGrad.addColorStop(0,    '#8B0000');
+    headGrad.addColorStop(0.3,  '#DD1A00');
+    headGrad.addColorStop(0.55, '#FF3A20');
+    headGrad.addColorStop(0.75, '#FF5535');
+    headGrad.addColorStop(1,    '#8B0000');
+    ctx.fillStyle = headGrad;
+    ctx.beginPath();
+    ctx.moveTo(0,          A_TOTAL);    // 先端
+    ctx.lineTo( AHW / 2,   ABH);        // 右
+    ctx.lineTo(-AHW / 2,   ABH);        // 左
+    ctx.closePath();
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = '#660000';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // 矢頭のハイライト（光沢）
+    ctx.fillStyle = 'rgba(255,210,180,0.4)';
+    ctx.beginPath();
+    ctx.moveTo(0,          A_TOTAL - 6);
+    ctx.lineTo( AHW * 0.2, ABH + 4);
+    ctx.lineTo(-AHW * 0.2, ABH + 4);
+    ctx.closePath();
+    ctx.fill();
+
+    // 根元の留め具（金の丸）
+    ctx.shadowColor = 'rgba(0,0,0,0.4)';
+    ctx.shadowBlur  = 4;
+    ctx.fillStyle = '#E8C000';
+    ctx.strokeStyle = '#806000';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(x, tipY - 4);
-    ctx.lineTo(x, tipY - hH - bH + 5);
+    ctx.arc(0, 0, ABW * 0.8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
     ctx.stroke();
 
     ctx.restore();
@@ -394,7 +436,6 @@
     const targetNum = shuffledWinners[wonCount];
     const targetIdx = NUMS.indexOf(targetNum);
 
-    // ポインター下(0°=上)に targetIdx セグメントを合わせる最終角度
     const targetMod  = ((340 - targetIdx * SEG_DEG) % 360 + 360) % 360;
     const currentMod = ((wheelAngle % 360) + 360) % 360;
     let   delta      = targetMod - currentMod;
@@ -406,7 +447,7 @@
     const DURATION = 4200;
     let   t0       = null;
     let   lastSeg  = getSegAtPointer(wheelAngle);
-    pointerDip     = 0;
+    arrowAngle = 0; arrowVel = 0;
 
     function ease(t) { return 1 - Math.pow(1 - t, 3); }
 
@@ -415,18 +456,15 @@
       const t    = Math.min((ts - t0) / DURATION, 1);
       const curA = startA + dist * ease(t);
 
-      // セグメントの区切りを通過するたびに矢が「カチッ」と動く
+      // セグメントの区切り通過 → 矢がカチッと揺れる
       const seg = getSegAtPointer(curA);
       if (seg !== lastSeg) {
-        if (pointerDip < 11) pointerDip = 11; // カチッと刺さる
+        arrowVel += 7; // 右に蹴られる（時計回り）
         lastSeg = seg;
       }
 
-      // 矢の跳ね返りを減衰
-      pointerDip *= 0.74;
-      if (pointerDip < 0.15) pointerDip = 0;
-
-      drawScene(curA, pointerDip, -1, 0);
+      updateArrow();
+      drawScene(curA, -1, 0);
 
       if (t < 1) {
         requestAnimationFrame(frame);
@@ -439,44 +477,39 @@
     requestAnimationFrame(frame);
   }
 
-  /* ---- 着地アニメーション（矢が深く刺さる＋セグメント発光）---- */
+  /* ---- 着地アニメーション（大きく揺れて発光）---- */
   function doLandAnimation(angle, segIdx, num) {
-    let dip     = 0;
-    let flashA  = 0;
-    let phase   = 'stick';  // stick → glow → fade
-    let f       = 0;
+    let flashA = 0;
+    let phase  = 'swing'; // swing → glow → fade
+    let f      = 0;
+
+    // 着地の大きなキック
+    arrowVel += 16;
 
     function landFrame() {
       f++;
+      updateArrow();
 
-      if (phase === 'stick' && f <= 12) {
-        // 矢がズバッと刺さる（急増）
-        dip   = f * 2.2;
-        flashA = f * 0.05;
-      } else if (phase === 'stick' && f <= 22) {
-        // 刺さったまま発光
-        flashA = Math.min(1, flashA + 0.07);
-        dip    = 26 - (f - 12) * 0.4;
-        if (f === 22) phase = 'glow';
-      } else if (phase === 'glow' && f <= 55) {
-        // 発光を維持しながら矢が少し戻る
-        dip    = Math.max(14, dip * 0.97);
-        flashA = 0.85 + Math.sin((f - 22) * 0.3) * 0.12; // 微点滅
+      if (phase === 'swing' && f < 20) {
+        flashA = Math.min(0.9, f * 0.055);
+      } else if (phase === 'swing') {
+        phase = 'glow';
+      } else if (phase === 'glow' && f < 55) {
+        flashA = 0.8 + Math.sin((f - 20) * 0.28) * 0.15;
       } else if (phase === 'glow') {
         phase = 'fade';
-      } else if (phase === 'fade') {
-        // フェードアウト
-        flashA -= 0.045;
-        dip    *= 0.88;
-        if (flashA <= 0 && dip < 0.5) {
-          drawScene(angle, 0, -1, 0);
+      } else {
+        flashA -= 0.04;
+        if (flashA <= 0 && Math.abs(arrowAngle) < 0.1) {
+          arrowAngle = 0; arrowVel = 0;
+          drawScene(angle, -1, 0);
           onWinner(num);
           return;
         }
         if (flashA < 0) flashA = 0;
       }
 
-      drawScene(angle, dip, segIdx, flashA);
+      drawScene(angle, segIdx, flashA);
       requestAnimationFrame(landFrame);
     }
     requestAnimationFrame(landFrame);
