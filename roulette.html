@@ -203,7 +203,7 @@
   </div>
 
   <div class="final-screen" id="final-screen">
-    <div class="final-title">🎉 当選発表！</div>
+    <div class="final-title">🎉 当選おめでとうございます！</div>
     <div class="final-sub">当選番号は以下の5名です</div>
     <div class="final-card">
       <div class="final-nums" id="final-nums"></div>
@@ -214,8 +214,6 @@
         <span class="dm-name">はかるもん</span>
       </div>
       <div class="dm-bubble">
-        <div class="dm-congrats">🎉 当選おめでとうございます！</div>
-        <div class="dm-nums-row" id="dm-nums-row"></div>
         <div class="dm-detail">詳細はInstagramまたはThreadsの<br>DMにてお送りします📩</div>
       </div>
     </div>
@@ -593,9 +591,7 @@
     document.getElementById('prize-info').style.display      = 'none';
     document.getElementById('final-nums').innerHTML =
       decidedWinners.map(n => `<div class="final-num-chip">${escHtml(n)}</div>`).join('');
-    document.getElementById('dm-nums-row').textContent =
-      '当選番号 ' + decidedWinners.join(' ');
-    document.getElementById('final-screen').style.display = 'block';
+document.getElementById('final-screen').style.display = 'block';
   }
 
   function escHtml(s) {
