@@ -13,7 +13,6 @@
       min-height: 100vh;
       color: #3a2010;
     }
-
     header {
       background: #7A5030;
       color: white;
@@ -29,10 +28,7 @@
       padding: 20px 16px 60px;
     }
 
-    .prize-info {
-      text-align: center;
-      margin-bottom: 16px;
-    }
+    .prize-info { text-align: center; margin-bottom: 14px; }
     .prize-badge {
       display: inline-block;
       background: #7A5030;
@@ -50,12 +46,7 @@
       margin-top: 4px;
     }
 
-    /* ---- ルーレット ---- */
-    .wheel-wrap {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
+    .wheel-wrap { display: flex; justify-content: center; margin-bottom: 18px; }
     #wheel-canvas {
       width: 100%;
       max-width: 320px;
@@ -63,7 +54,6 @@
       display: block;
     }
 
-    /* ---- ボタン ---- */
     .spin-btn {
       display: block;
       width: 100%;
@@ -81,10 +71,9 @@
       transition: transform 0.12s, box-shadow 0.12s;
       margin-bottom: 24px;
     }
-    .spin-btn:active { transform: scale(0.96); box-shadow: 0 2px 8px rgba(122,80,48,0.25); }
+    .spin-btn:active { transform: scale(0.96); }
     .spin-btn:disabled { opacity: 0.4; cursor: default; transform: none; }
 
-    /* ---- 当選番号チップ ---- */
     .winners-section {
       background: #FCF6E4;
       border-radius: 16px;
@@ -92,22 +81,15 @@
       margin-bottom: 16px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.07);
     }
-    .winners-section h3 {
-      font-size: 0.82rem;
-      color: rgba(58,32,16,0.5);
-      margin-bottom: 12px;
-    }
+    .winners-section h3 { font-size: 0.82rem; color: rgba(58,32,16,0.5); margin-bottom: 12px; }
     .winner-chips { display: flex; flex-wrap: wrap; gap: 10px; }
     .winner-chip {
       width: 56px; height: 56px;
       border-radius: 50%;
       background: #7A5030;
       color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.65rem;
-      font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.65rem; font-weight: 800;
       box-shadow: 0 2px 8px rgba(122,80,48,0.35);
       animation: chipIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
     }
@@ -116,10 +98,8 @@
       to   { transform: scale(1); opacity: 1; }
     }
 
-    /* ---- 最終画面 ---- */
     .final-screen {
-      display: none;
-      text-align: center;
+      display: none; text-align: center;
       animation: finalIn 0.65s cubic-bezier(0.34,1.56,0.64,1);
     }
     @keyframes finalIn {
@@ -129,50 +109,32 @@
     .final-title { font-size: 1.9rem; font-weight: 800; margin-bottom: 6px; }
     .final-sub { font-size: 0.85rem; color: rgba(58,32,16,0.55); margin-bottom: 20px; }
     .final-card {
-      background: #FCF6E4;
-      border-radius: 20px;
-      padding: 28px 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      background: #FCF6E4; border-radius: 20px; padding: 28px 20px;
+      margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);
     }
     .final-nums { display: flex; justify-content: center; flex-wrap: wrap; gap: 14px; }
     .final-num-chip {
-      width: 70px; height: 70px;
-      border-radius: 50%;
-      background: #7A5030;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      font-weight: 800;
+      width: 70px; height: 70px; border-radius: 50%;
+      background: #7A5030; color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; font-weight: 800;
       box-shadow: 0 3px 12px rgba(122,80,48,0.4);
     }
     .final-message {
-      background: #7A5030;
-      color: white;
-      border-radius: 50px;
-      padding: 16px 24px;
-      font-size: 0.98rem;
-      font-weight: bold;
+      background: #7A5030; color: white;
+      border-radius: 50px; padding: 16px 24px;
+      font-size: 0.98rem; font-weight: bold;
     }
 
-    /* ---- 当選オーバーレイ ---- */
     .overlay {
-      display: none;
-      position: fixed; inset: 0;
-      background: rgba(58,32,16,0.55);
-      z-index: 100;
-      align-items: center;
-      justify-content: center;
+      display: none; position: fixed; inset: 0;
+      background: rgba(58,32,16,0.55); z-index: 100;
+      align-items: center; justify-content: center;
     }
     .overlay.show { display: flex; }
     .overlay-card {
-      background: #FCF6E4;
-      border-radius: 28px;
-      padding: 40px 38px 34px;
-      text-align: center;
-      width: 290px;
+      background: #FCF6E4; border-radius: 28px;
+      padding: 40px 38px 34px; text-align: center; width: 290px;
       animation: cardPop 0.42s cubic-bezier(0.34,1.56,0.64,1);
     }
     @keyframes cardPop {
@@ -180,14 +142,11 @@
       to   { transform: scale(1); opacity: 1; }
     }
     .ov-confetti { font-size: 1.4rem; margin-bottom: 6px; }
-    .ov-label { font-size: 0.88rem; color: rgba(58,32,16,0.5); margin-bottom: 4px; }
-    .ov-count { font-size: 0.9rem; color: rgba(58,32,16,0.45); margin-bottom: 16px; }
+    .ov-label  { font-size: 0.88rem; color: rgba(58,32,16,0.5); margin-bottom: 4px; }
+    .ov-count  { font-size: 0.9rem; color: rgba(58,32,16,0.45); margin-bottom: 16px; }
     .ov-num {
-      font-size: 5rem;
-      font-weight: 800;
-      color: #7A5030;
-      line-height: 1;
-      margin-bottom: 28px;
+      font-size: 5rem; font-weight: 800; color: #7A5030;
+      line-height: 1; margin-bottom: 28px;
       animation: numPop 0.5s cubic-bezier(0.34,1.56,0.64,1);
     }
     @keyframes numPop {
@@ -195,17 +154,10 @@
       to   { transform: scale(1); opacity: 1; }
     }
     .ov-next-btn {
-      background: #7A5030;
-      color: white;
-      border: none;
-      border-radius: 50px;
-      padding: 14px 40px;
-      font-size: 1rem;
-      font-weight: 800;
-      font-family: inherit;
-      cursor: pointer;
-      box-shadow: 0 3px 12px rgba(122,80,48,0.35);
-      transition: transform 0.1s;
+      background: #7A5030; color: white; border: none;
+      border-radius: 50px; padding: 14px 40px;
+      font-size: 1rem; font-weight: 800; font-family: inherit; cursor: pointer;
+      box-shadow: 0 3px 12px rgba(122,80,48,0.35); transition: transform 0.1s;
     }
     .ov-next-btn:active { transform: scale(0.95); }
   </style>
@@ -224,7 +176,7 @@
   </div>
 
   <div class="wheel-wrap" id="wheel-wrap">
-    <canvas id="wheel-canvas" width="320" height="320"></canvas>
+    <canvas id="wheel-canvas" width="320" height="350"></canvas>
   </div>
 
   <button class="spin-btn" id="spin-btn" onclick="spin()">▶ スタート</button>
@@ -257,131 +209,179 @@
 <script>
   const NUMS    = ['②','③','④','⑤','⑥','⑦','⑧','⑨','⑩'];
   const WIN_NUMS = ['②','④','⑤','⑦','⑧'];
-  const MAX_W   = 5;
   const SEG_DEG = 360 / NUMS.length; // 40°
+  const MAX_W   = 5;
 
-  // ベージュ×茶色の交互カラー
-  const SEG_COLORS = [
-    { bg: '#F0E0C0', text: '#5a2c0a' }, // クリーム
-    { bg: '#8B5E3C', text: '#ffffff' }, // ミディアムブラウン
-    { bg: '#E4D0A8', text: '#5a2c0a' }, // ウォームベージュ
-    { bg: '#6B4226', text: '#ffffff' }, // ダークブラウン
-    { bg: '#ECD9BA', text: '#5a2c0a' }, // ライトタン
-    { bg: '#A07540', text: '#ffffff' }, // キャラメル
-    { bg: '#DCC8A0', text: '#5a2c0a' }, // サンドベージュ
-    { bg: '#7A5030', text: '#ffffff' }, // ディープブラウン
-    { bg: '#D4B896', text: '#5a2c0a' }, // タンベージュ
+  // ホイールの中心・半径（canvas 320×350）
+  const CX = 160, CY = 202, R = 142;
+
+  // ベージュ×茶色のセグメントカラー（交互）
+  const SEG = [
+    { bg: '#F0E0C0', text: '#5a2c0a' },
+    { bg: '#8B5E3C', text: '#ffffff' },
+    { bg: '#E4D0A8', text: '#5a2c0a' },
+    { bg: '#6B4226', text: '#ffffff' },
+    { bg: '#ECD9BA', text: '#5a2c0a' },
+    { bg: '#A07540', text: '#ffffff' },
+    { bg: '#DCC8A0', text: '#5a2c0a' },
+    { bg: '#7A5030', text: '#ffffff' },
+    { bg: '#D4B896', text: '#5a2c0a' },
   ];
 
   let shuffledWinners = [...WIN_NUMS].sort(() => Math.random() - 0.5);
   let wonCount       = 0;
   let decidedWinners = [];
-  let wheelAngle     = 0; // 累計回転角度（度）
+  let wheelAngle     = 0;
   let spinning       = false;
+  let pointerDip     = 0; // 矢が刺さる量（正＝ホイール内側へ）
 
   const canvas = document.getElementById('wheel-canvas');
   const ctx    = canvas.getContext('2d');
-  const PI2    = Math.PI * 2;
   const D2R    = Math.PI / 180;
 
-  /* ---- ルーレット描画 ---- */
-  function drawWheel(angle) {
-    const W  = canvas.width;
-    const H  = canvas.height;
-    const cx = W / 2;         // 160
-    const cy = H / 2 + 10;   // 170（中心を少し下にしてポインター用スペース確保）
-    const r  = 138;           // ホイール半径
+  /* ---- ポインター位置のセグメントを返す ---- */
+  function getSegAtPointer(angle) {
+    const pos = (((360 - angle % 360) % 360) + 360) % 360;
+    return Math.floor(pos / SEG_DEG) % NUMS.length;
+  }
 
-    ctx.clearRect(0, 0, W, H);
+  /* ---- 全体描画 ---- */
+  function drawScene(angle, dip, flashSeg, flashA) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // === 回転するホイール ===
+    // === ホイール（回転）===
     ctx.save();
-    ctx.translate(cx, cy);
+    ctx.translate(CX, CY);
     ctx.rotate(angle * D2R);
 
     NUMS.forEach((num, i) => {
-      const startA = (i * SEG_DEG - 90) * D2R;
-      const endA   = ((i + 1) * SEG_DEG - 90) * D2R;
-      const midA   = ((i + 0.5) * SEG_DEG - 90) * D2R;
+      const sA = (i * SEG_DEG - 90) * D2R;
+      const eA = ((i + 1) * SEG_DEG - 90) * D2R;
+      const mA = ((i + 0.5) * SEG_DEG - 90) * D2R;
 
-      // セグメント塗り
+      // セグメント
       ctx.beginPath();
       ctx.moveTo(0, 0);
-      ctx.arc(0, 0, r, startA, endA);
+      ctx.arc(0, 0, R, sA, eA);
       ctx.closePath();
-      ctx.fillStyle = SEG_COLORS[i].bg;
+      ctx.fillStyle = SEG[i].bg;
       ctx.fill();
-
-      // 区切り線
-      ctx.strokeStyle = 'rgba(255,255,255,0.75)';
-      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = 'rgba(255,255,255,0.72)';
+      ctx.lineWidth = 2;
       ctx.stroke();
 
-      // 数字テキスト
-      const tR = r * 0.68;
+      // 番号テキスト
+      const tR = R * 0.69;
       ctx.save();
-      ctx.translate(Math.cos(midA) * tR, Math.sin(midA) * tR);
-      ctx.rotate(midA + Math.PI / 2);
-      ctx.fillStyle = SEG_COLORS[i].text;
-      ctx.font = `800 ${Math.floor(r * 0.17)}px 'M PLUS Rounded 1c', sans-serif`;
+      ctx.translate(Math.cos(mA) * tR, Math.sin(mA) * tR);
+      ctx.rotate(mA + Math.PI / 2);
+      ctx.fillStyle = SEG[i].text;
+      ctx.font = `800 ${Math.floor(R * 0.17)}px 'M PLUS Rounded 1c', sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(num, 0, 0);
       ctx.restore();
     });
 
+    // 当選セグメントのフラッシュ
+    if (flashSeg >= 0 && flashA > 0) {
+      const sA = (flashSeg * SEG_DEG - 90) * D2R;
+      const eA = ((flashSeg + 1) * SEG_DEG - 90) * D2R;
+      const mA = ((flashSeg + 0.5) * SEG_DEG - 90) * D2R;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.arc(0, 0, R, sA, eA);
+      ctx.closePath();
+      ctx.fillStyle = `rgba(255,245,170,${flashA})`;
+      ctx.fill();
+      // 番号を上書き（明確に見えるよう）
+      const tR = R * 0.69;
+      ctx.save();
+      ctx.translate(Math.cos(mA) * tR, Math.sin(mA) * tR);
+      ctx.rotate(mA + Math.PI / 2);
+      ctx.fillStyle = '#5a2c0a';
+      ctx.font = `800 ${Math.floor(R * 0.17)}px 'M PLUS Rounded 1c', sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(NUMS[flashSeg], 0, 0);
+      ctx.restore();
+    }
+
     // 外枠リング
     ctx.beginPath();
-    ctx.arc(0, 0, r + 2, 0, PI2);
+    ctx.arc(0, 0, R + 2, 0, Math.PI * 2);
     ctx.strokeStyle = '#5a2c0a';
     ctx.lineWidth = 9;
     ctx.stroke();
 
     // 外枠ハイライト
     ctx.beginPath();
-    ctx.arc(0, 0, r + 5, 0, PI2);
-    ctx.strokeStyle = 'rgba(255,240,210,0.35)';
+    ctx.arc(0, 0, R + 6, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(255,240,200,0.28)';
     ctx.lineWidth = 3;
     ctx.stroke();
 
     // 中心ハブ
     ctx.beginPath();
-    ctx.arc(0, 0, r * 0.1, 0, PI2);
+    ctx.arc(0, 0, R * 0.1, 0, Math.PI * 2);
     ctx.fillStyle = '#3a2010';
     ctx.fill();
-    ctx.strokeStyle = 'rgba(255,240,200,0.6)';
+    ctx.strokeStyle = 'rgba(255,240,200,0.55)';
     ctx.lineWidth = 2;
     ctx.stroke();
 
     ctx.restore();
 
-    // === 固定ポインター（ピン）===
-    const tipX  = cx;
-    const tipY  = cy - r - 4;   // ホイール縁のすぐ外
-    const pinH  = 26;
-    const pinW  = 15;
+    // === 矢（固定・回転しない）===
+    // dip が大きいほど先端がホイール内側に入る
+    const tipY = CY - R - 4 + dip;
+    drawArrow(CX, tipY);
+  }
+
+  /* ---- 矢（ポインター）描画 ---- */
+  function drawArrow(x, tipY) {
+    const hH = 28; // 矢頭の高さ
+    const hW = 24; // 矢頭の幅
+    const bH = 28; // シャフト高さ
+    const bW = 10; // シャフト幅
 
     ctx.save();
-    ctx.shadowColor = 'rgba(0,0,0,0.35)';
-    ctx.shadowBlur  = 6;
+    ctx.shadowColor = 'rgba(0,0,0,0.4)';
+    ctx.shadowBlur  = 8;
     ctx.shadowOffsetY = 2;
-    ctx.fillStyle = '#5a2c0a';
+
+    // 矢の輪郭
     ctx.beginPath();
-    ctx.moveTo(tipX, tipY);                    // 先端（下）
-    ctx.lineTo(tipX - pinW, tipY - pinH);      // 左上
-    ctx.lineTo(tipX + pinW, tipY - pinH);      // 右上
+    ctx.moveTo(x,          tipY);              // 先端（下）
+    ctx.lineTo(x + hW / 2, tipY - hH);        // 矢頭 右
+    ctx.lineTo(x + bW / 2, tipY - hH);        // シャフト右 開始
+    ctx.lineTo(x + bW / 2, tipY - hH - bH);   // シャフト右 上
+    ctx.lineTo(x - bW / 2, tipY - hH - bH);   // シャフト左 上
+    ctx.lineTo(x - bW / 2, tipY - hH);        // シャフト左 開始
+    ctx.lineTo(x - hW / 2, tipY - hH);        // 矢頭 左
     ctx.closePath();
+
+    // グラデーション塗り
+    const grad = ctx.createLinearGradient(x - hW / 2, 0, x + hW / 2, 0);
+    grad.addColorStop(0,   '#D4B896');
+    grad.addColorStop(0.5, '#F5EAD0');
+    grad.addColorStop(1,   '#C4A880');
+    ctx.fillStyle = grad;
     ctx.fill();
 
-    // ピンのハイライト
     ctx.shadowBlur = 0;
-    ctx.fillStyle = 'rgba(255,240,210,0.3)';
+    ctx.strokeStyle = '#5a2c0a';
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+
+    // 中心ライン（矢らしさ演出）
+    ctx.strokeStyle = 'rgba(90,44,10,0.25)';
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(tipX, tipY);
-    ctx.lineTo(tipX - pinW * 0.5, tipY - pinH * 0.55);
-    ctx.lineTo(tipX + pinW * 0.5, tipY - pinH * 0.55);
-    ctx.closePath();
-    ctx.fill();
+    ctx.moveTo(x, tipY - 4);
+    ctx.lineTo(x, tipY - hH - bH + 5);
+    ctx.stroke();
+
     ctx.restore();
   }
 
@@ -392,39 +392,94 @@
     document.getElementById('spin-btn').disabled = true;
 
     const targetNum = shuffledWinners[wonCount];
-    const targetIdx = NUMS.indexOf(targetNum); // 0-8
+    const targetIdx = NUMS.indexOf(targetNum);
 
-    // wheelAngle だけ回転した後、ポインター(上=0°)が指す wheel 上の角度：
-    // = (360 - wheelAngle % 360) % 360
-    // セグメント i の中心角 = i*40 + 20（上を0°として時計回り）
-    // 目標: wheelAngle % 360 = (340 - targetIdx*40 + 360) % 360
+    // ポインター下(0°=上)に targetIdx セグメントを合わせる最終角度
     const targetMod  = ((340 - targetIdx * SEG_DEG) % 360 + 360) % 360;
     const currentMod = ((wheelAngle % 360) + 360) % 360;
     let   delta      = targetMod - currentMod;
     if (delta <= 0) delta += 360;
 
-    const FULL     = 8; // フル回転数
-    const endAngle = wheelAngle + delta + FULL * 360;
-    const start    = wheelAngle;
-    const dist     = endAngle - start;
+    const endAngle = wheelAngle + delta + 8 * 360;
+    const startA   = wheelAngle;
+    const dist     = endAngle - startA;
     const DURATION = 4200;
     let   t0       = null;
+    let   lastSeg  = getSegAtPointer(wheelAngle);
+    pointerDip     = 0;
 
-    // easeOutCubic: 最初速く徐々に減速
     function ease(t) { return 1 - Math.pow(1 - t, 3); }
 
     function frame(ts) {
       if (!t0) t0 = ts;
-      const t   = Math.min((ts - t0) / DURATION, 1);
-      drawWheel(start + dist * ease(t));
+      const t    = Math.min((ts - t0) / DURATION, 1);
+      const curA = startA + dist * ease(t);
+
+      // セグメントの区切りを通過するたびに矢が「カチッ」と動く
+      const seg = getSegAtPointer(curA);
+      if (seg !== lastSeg) {
+        if (pointerDip < 11) pointerDip = 11; // カチッと刺さる
+        lastSeg = seg;
+      }
+
+      // 矢の跳ね返りを減衰
+      pointerDip *= 0.74;
+      if (pointerDip < 0.15) pointerDip = 0;
+
+      drawScene(curA, pointerDip, -1, 0);
+
       if (t < 1) {
         requestAnimationFrame(frame);
       } else {
         wheelAngle = endAngle;
-        onWinner(targetNum);
+        const winSeg = getSegAtPointer(endAngle);
+        doLandAnimation(endAngle, winSeg, targetNum);
       }
     }
     requestAnimationFrame(frame);
+  }
+
+  /* ---- 着地アニメーション（矢が深く刺さる＋セグメント発光）---- */
+  function doLandAnimation(angle, segIdx, num) {
+    let dip     = 0;
+    let flashA  = 0;
+    let phase   = 'stick';  // stick → glow → fade
+    let f       = 0;
+
+    function landFrame() {
+      f++;
+
+      if (phase === 'stick' && f <= 12) {
+        // 矢がズバッと刺さる（急増）
+        dip   = f * 2.2;
+        flashA = f * 0.05;
+      } else if (phase === 'stick' && f <= 22) {
+        // 刺さったまま発光
+        flashA = Math.min(1, flashA + 0.07);
+        dip    = 26 - (f - 12) * 0.4;
+        if (f === 22) phase = 'glow';
+      } else if (phase === 'glow' && f <= 55) {
+        // 発光を維持しながら矢が少し戻る
+        dip    = Math.max(14, dip * 0.97);
+        flashA = 0.85 + Math.sin((f - 22) * 0.3) * 0.12; // 微点滅
+      } else if (phase === 'glow') {
+        phase = 'fade';
+      } else if (phase === 'fade') {
+        // フェードアウト
+        flashA -= 0.045;
+        dip    *= 0.88;
+        if (flashA <= 0 && dip < 0.5) {
+          drawScene(angle, 0, -1, 0);
+          onWinner(num);
+          return;
+        }
+        if (flashA < 0) flashA = 0;
+      }
+
+      drawScene(angle, dip, segIdx, flashA);
+      requestAnimationFrame(landFrame);
+    }
+    requestAnimationFrame(landFrame);
   }
 
   /* ---- 当選処理 ---- */
@@ -433,7 +488,7 @@
     decidedWinners.push(num);
     updateWinnersList();
     updateRemain();
-    setTimeout(() => showOverlay(num), 450);
+    setTimeout(() => showOverlay(num), 300);
   }
 
   function showOverlay(num) {
@@ -487,7 +542,7 @@
   }
 
   // 初期描画
-  drawWheel(0);
+  drawScene(0, 0, -1, 0);
 </script>
 </body>
 </html>
