@@ -15,7 +15,7 @@
     }
 
     header {
-      background: #CC4A00;
+      background: #7A5030;
       color: white;
       text-align: center;
       padding: 22px 16px 18px;
@@ -26,17 +26,16 @@
     .main {
       max-width: 380px;
       margin: 0 auto;
-      padding: 24px 16px 60px;
+      padding: 20px 16px 60px;
     }
 
-    /* ---- 残り枠 ---- */
     .prize-info {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
     .prize-badge {
       display: inline-block;
-      background: #CC4A00;
+      background: #7A5030;
       color: white;
       border-radius: 20px;
       padding: 6px 22px;
@@ -51,80 +50,25 @@
       margin-top: 4px;
     }
 
-    /* ---- ルーレットカード ---- */
-    .reel-card {
-      background: #9CC6DB;
-      border-radius: 20px;
-      padding: 22px 18px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.14);
-    }
-
-    .reel-window {
-      position: relative;
-      height: 300px; /* 3 × 100px */
-      overflow: hidden;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.15);
-    }
-
-    /* 上下グラデーション */
-    .reel-window::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 110px;
-      background: linear-gradient(to bottom, rgba(156,198,219,0.96) 0%, transparent 100%);
-      z-index: 2;
-      pointer-events: none;
-    }
-    .reel-window::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 110px;
-      background: linear-gradient(to top, rgba(156,198,219,0.96) 0%, transparent 100%);
-      z-index: 2;
-      pointer-events: none;
-    }
-
-    /* センター帯 */
-    .reel-center {
-      position: absolute;
-      top: 100px; left: 12px; right: 12px;
-      height: 100px;
-      border: 3px solid rgba(204,74,0,0.65);
-      border-radius: 10px;
-      background: rgba(252,246,228,0.2);
-      z-index: 3;
-      pointer-events: none;
-    }
-
-    #reel-strip {
+    /* ---- ルーレット ---- */
+    .wheel-wrap {
       display: flex;
-      flex-direction: column;
-      will-change: transform;
-    }
-
-    .reel-item {
-      height: 100px;
-      display: flex;
-      align-items: center;
       justify-content: center;
-      font-size: 4.5rem;
-      font-weight: 800;
-      color: #3a2010;
-      flex-shrink: 0;
-      user-select: none;
-      line-height: 1;
+      margin-bottom: 20px;
+    }
+    #wheel-canvas {
+      width: 100%;
+      max-width: 320px;
+      height: auto;
+      display: block;
     }
 
-    /* ---- スタートボタン ---- */
+    /* ---- ボタン ---- */
     .spin-btn {
       display: block;
       width: 100%;
       padding: 18px;
-      background: #CC4A00;
+      background: #7A5030;
       color: white;
       border: none;
       border-radius: 50px;
@@ -132,12 +76,12 @@
       font-weight: 800;
       font-family: inherit;
       cursor: pointer;
-      box-shadow: 0 4px 18px rgba(204,74,0,0.42);
+      box-shadow: 0 4px 18px rgba(122,80,48,0.45);
       letter-spacing: 0.06em;
       transition: transform 0.12s, box-shadow 0.12s;
       margin-bottom: 24px;
     }
-    .spin-btn:active { transform: scale(0.96); box-shadow: 0 2px 8px rgba(204,74,0,0.25); }
+    .spin-btn:active { transform: scale(0.96); box-shadow: 0 2px 8px rgba(122,80,48,0.25); }
     .spin-btn:disabled { opacity: 0.4; cursor: default; transform: none; }
 
     /* ---- 当選番号チップ ---- */
@@ -153,22 +97,18 @@
       color: rgba(58,32,16,0.5);
       margin-bottom: 12px;
     }
-    .winner-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
+    .winner-chips { display: flex; flex-wrap: wrap; gap: 10px; }
     .winner-chip {
       width: 56px; height: 56px;
       border-radius: 50%;
-      background: #CC4A00;
+      background: #7A5030;
       color: white;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 1.65rem;
       font-weight: 800;
-      box-shadow: 0 2px 8px rgba(204,74,0,0.35);
+      box-shadow: 0 2px 8px rgba(122,80,48,0.35);
       animation: chipIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
     }
     @keyframes chipIn {
@@ -195,39 +135,33 @@
       margin-bottom: 20px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.08);
     }
-    .final-nums {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 14px;
-    }
+    .final-nums { display: flex; justify-content: center; flex-wrap: wrap; gap: 14px; }
     .final-num-chip {
       width: 70px; height: 70px;
       border-radius: 50%;
-      background: #CC4A00;
+      background: #7A5030;
       color: white;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 2rem;
       font-weight: 800;
-      box-shadow: 0 3px 12px rgba(204,74,0,0.4);
+      box-shadow: 0 3px 12px rgba(122,80,48,0.4);
     }
     .final-message {
-      background: #CC4A00;
+      background: #7A5030;
       color: white;
       border-radius: 50px;
       padding: 16px 24px;
       font-size: 0.98rem;
       font-weight: bold;
-      letter-spacing: 0.02em;
     }
 
     /* ---- 当選オーバーレイ ---- */
     .overlay {
       display: none;
       position: fixed; inset: 0;
-      background: rgba(58,32,16,0.52);
+      background: rgba(58,32,16,0.55);
       z-index: 100;
       align-items: center;
       justify-content: center;
@@ -251,7 +185,7 @@
     .ov-num {
       font-size: 5rem;
       font-weight: 800;
-      color: #CC4A00;
+      color: #7A5030;
       line-height: 1;
       margin-bottom: 28px;
       animation: numPop 0.5s cubic-bezier(0.34,1.56,0.64,1);
@@ -261,7 +195,7 @@
       to   { transform: scale(1); opacity: 1; }
     }
     .ov-next-btn {
-      background: #CC4A00;
+      background: #7A5030;
       color: white;
       border: none;
       border-radius: 50px;
@@ -270,7 +204,7 @@
       font-weight: 800;
       font-family: inherit;
       cursor: pointer;
-      box-shadow: 0 3px 12px rgba(204,74,0,0.35);
+      box-shadow: 0 3px 12px rgba(122,80,48,0.35);
       transition: transform 0.1s;
     }
     .ov-next-btn:active { transform: scale(0.95); }
@@ -289,23 +223,17 @@
     <span id="prize-remain">残り 5枠</span>
   </div>
 
-  <!-- ルーレット -->
-  <div class="reel-card" id="reel-card">
-    <div class="reel-window">
-      <div class="reel-center"></div>
-      <div id="reel-strip"></div>
-    </div>
+  <div class="wheel-wrap" id="wheel-wrap">
+    <canvas id="wheel-canvas" width="320" height="320"></canvas>
   </div>
 
   <button class="spin-btn" id="spin-btn" onclick="spin()">▶ スタート</button>
 
-  <!-- 途中の当選番号 -->
   <div class="winners-section" id="winners-section" style="display:none">
     <h3>当選番号</h3>
     <div class="winner-chips" id="winner-chips"></div>
   </div>
 
-  <!-- 最終画面 -->
   <div class="final-screen" id="final-screen">
     <div class="final-title">🎉 当選発表！</div>
     <div class="final-sub">当選番号は以下の5名です</div>
@@ -316,7 +244,6 @@
   </div>
 </div>
 
-<!-- 当選オーバーレイ -->
 <div class="overlay" id="overlay">
   <div class="overlay-card">
     <div class="ov-confetti">🎊 🎉 🎊</div>
@@ -328,36 +255,134 @@
 </div>
 
 <script>
-  // ② = U+2461, index 0 → ⑩ = U+2469, index 8
-  const NUMS = ['②','③','④','⑤','⑥','⑦','⑧','⑨','⑩'];
-  const WIN_NUMS = ['②','④','⑤','⑦','⑧']; // 必ず当選する番号
-  const ITEM_H  = 100; // px
+  const NUMS    = ['②','③','④','⑤','⑥','⑦','⑧','⑨','⑩'];
+  const WIN_NUMS = ['②','④','⑤','⑦','⑧'];
   const MAX_W   = 5;
-  const REP     = 65;  // リールの繰り返し回数（540アイテム → 65*9=585）
+  const SEG_DEG = 360 / NUMS.length; // 40°
 
-  // 当選順をシャッフル
+  // ベージュ×茶色の交互カラー
+  const SEG_COLORS = [
+    { bg: '#F0E0C0', text: '#5a2c0a' }, // クリーム
+    { bg: '#8B5E3C', text: '#ffffff' }, // ミディアムブラウン
+    { bg: '#E4D0A8', text: '#5a2c0a' }, // ウォームベージュ
+    { bg: '#6B4226', text: '#ffffff' }, // ダークブラウン
+    { bg: '#ECD9BA', text: '#5a2c0a' }, // ライトタン
+    { bg: '#A07540', text: '#ffffff' }, // キャラメル
+    { bg: '#DCC8A0', text: '#5a2c0a' }, // サンドベージュ
+    { bg: '#7A5030', text: '#ffffff' }, // ディープブラウン
+    { bg: '#D4B896', text: '#5a2c0a' }, // タンベージュ
+  ];
+
   let shuffledWinners = [...WIN_NUMS].sort(() => Math.random() - 0.5);
-  let wonCount = 0;
+  let wonCount       = 0;
   let decidedWinners = [];
-  let currentOffset = 0; // translateY の正値（ピクセル）
-  let spinning = false;
+  let wheelAngle     = 0; // 累計回転角度（度）
+  let spinning       = false;
 
-  /* ---- リール構築 ---- */
-  function buildReel() {
-    const strip = document.getElementById('reel-strip');
-    strip.innerHTML = '';
-    for (let r = 0; r < REP; r++) {
-      NUMS.forEach(num => {
-        const div = document.createElement('div');
-        div.className = 'reel-item';
-        div.textContent = num;
-        strip.appendChild(div);
-      });
-    }
-    // 初期位置: 3サイクル目の ② (globalIdx=18) をセンターに
-    // センターに globalIdx=i を表示するには: offset = (i-1) * ITEM_H
-    currentOffset = 17 * ITEM_H; // (18-1)*100 = 1700
-    strip.style.transform = `translateY(-${currentOffset}px)`;
+  const canvas = document.getElementById('wheel-canvas');
+  const ctx    = canvas.getContext('2d');
+  const PI2    = Math.PI * 2;
+  const D2R    = Math.PI / 180;
+
+  /* ---- ルーレット描画 ---- */
+  function drawWheel(angle) {
+    const W  = canvas.width;
+    const H  = canvas.height;
+    const cx = W / 2;         // 160
+    const cy = H / 2 + 10;   // 170（中心を少し下にしてポインター用スペース確保）
+    const r  = 138;           // ホイール半径
+
+    ctx.clearRect(0, 0, W, H);
+
+    // === 回転するホイール ===
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(angle * D2R);
+
+    NUMS.forEach((num, i) => {
+      const startA = (i * SEG_DEG - 90) * D2R;
+      const endA   = ((i + 1) * SEG_DEG - 90) * D2R;
+      const midA   = ((i + 0.5) * SEG_DEG - 90) * D2R;
+
+      // セグメント塗り
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.arc(0, 0, r, startA, endA);
+      ctx.closePath();
+      ctx.fillStyle = SEG_COLORS[i].bg;
+      ctx.fill();
+
+      // 区切り線
+      ctx.strokeStyle = 'rgba(255,255,255,0.75)';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+
+      // 数字テキスト
+      const tR = r * 0.68;
+      ctx.save();
+      ctx.translate(Math.cos(midA) * tR, Math.sin(midA) * tR);
+      ctx.rotate(midA + Math.PI / 2);
+      ctx.fillStyle = SEG_COLORS[i].text;
+      ctx.font = `800 ${Math.floor(r * 0.17)}px 'M PLUS Rounded 1c', sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(num, 0, 0);
+      ctx.restore();
+    });
+
+    // 外枠リング
+    ctx.beginPath();
+    ctx.arc(0, 0, r + 2, 0, PI2);
+    ctx.strokeStyle = '#5a2c0a';
+    ctx.lineWidth = 9;
+    ctx.stroke();
+
+    // 外枠ハイライト
+    ctx.beginPath();
+    ctx.arc(0, 0, r + 5, 0, PI2);
+    ctx.strokeStyle = 'rgba(255,240,210,0.35)';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // 中心ハブ
+    ctx.beginPath();
+    ctx.arc(0, 0, r * 0.1, 0, PI2);
+    ctx.fillStyle = '#3a2010';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,240,200,0.6)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.restore();
+
+    // === 固定ポインター（ピン）===
+    const tipX  = cx;
+    const tipY  = cy - r - 4;   // ホイール縁のすぐ外
+    const pinH  = 26;
+    const pinW  = 15;
+
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.35)';
+    ctx.shadowBlur  = 6;
+    ctx.shadowOffsetY = 2;
+    ctx.fillStyle = '#5a2c0a';
+    ctx.beginPath();
+    ctx.moveTo(tipX, tipY);                    // 先端（下）
+    ctx.lineTo(tipX - pinW, tipY - pinH);      // 左上
+    ctx.lineTo(tipX + pinW, tipY - pinH);      // 右上
+    ctx.closePath();
+    ctx.fill();
+
+    // ピンのハイライト
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = 'rgba(255,240,210,0.3)';
+    ctx.beginPath();
+    ctx.moveTo(tipX, tipY);
+    ctx.lineTo(tipX - pinW * 0.5, tipY - pinH * 0.55);
+    ctx.lineTo(tipX + pinW * 0.5, tipY - pinH * 0.55);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
   }
 
   /* ---- スピン ---- */
@@ -367,41 +392,38 @@
     document.getElementById('spin-btn').disabled = true;
 
     const targetNum = shuffledWinners[wonCount];
+    const targetIdx = NUMS.indexOf(targetNum); // 0-8
 
-    // 現在のセンターアイテムのグローバルインデックス
-    const currentCenter = Math.round(currentOffset / ITEM_H) + 1;
-    // 最低10サイクル(90アイテム)先から対象を探す
-    const searchFrom = currentCenter + NUMS.length * 10;
-    const maxGI = REP * NUMS.length - 3;
+    // wheelAngle だけ回転した後、ポインター(上=0°)が指す wheel 上の角度：
+    // = (360 - wheelAngle % 360) % 360
+    // セグメント i の中心角 = i*40 + 20（上を0°として時計回り）
+    // 目標: wheelAngle % 360 = (340 - targetIdx*40 + 360) % 360
+    const targetMod  = ((340 - targetIdx * SEG_DEG) % 360 + 360) % 360;
+    const currentMod = ((wheelAngle % 360) + 360) % 360;
+    let   delta      = targetMod - currentMod;
+    if (delta <= 0) delta += 360;
 
-    let gi = searchFrom;
-    while (gi < maxGI) {
-      if (NUMS[gi % NUMS.length] === targetNum) break;
-      gi++;
-    }
+    const FULL     = 8; // フル回転数
+    const endAngle = wheelAngle + delta + FULL * 360;
+    const start    = wheelAngle;
+    const dist     = endAngle - start;
+    const DURATION = 4200;
+    let   t0       = null;
 
-    const targetOffset = (gi - 1) * ITEM_H;
-    const startOffset  = currentOffset;
-    const distance     = targetOffset - startOffset;
-    const DURATION     = 3800; // ms
-    let   startTime    = null;
-
-    // easeOutCubic: 最初速く、徐々に減速
+    // easeOutCubic: 最初速く徐々に減速
     function ease(t) { return 1 - Math.pow(1 - t, 3); }
 
     function frame(ts) {
-      if (!startTime) startTime = ts;
-      const t   = Math.min((ts - startTime) / DURATION, 1);
-      const pos = startOffset + distance * ease(t);
-      document.getElementById('reel-strip').style.transform = `translateY(-${pos}px)`;
+      if (!t0) t0 = ts;
+      const t   = Math.min((ts - t0) / DURATION, 1);
+      drawWheel(start + dist * ease(t));
       if (t < 1) {
         requestAnimationFrame(frame);
       } else {
-        currentOffset = targetOffset;
+        wheelAngle = endAngle;
         onWinner(targetNum);
       }
     }
-
     requestAnimationFrame(frame);
   }
 
@@ -411,18 +433,15 @@
     decidedWinners.push(num);
     updateWinnersList();
     updateRemain();
-    setTimeout(() => showOverlay(num), 400);
+    setTimeout(() => showOverlay(num), 450);
   }
 
   function showOverlay(num) {
-    // ov-numのアニメーションをリセットして再適用
     const el = document.getElementById('ov-num');
     el.style.animation = 'none';
     el.textContent = num;
-    // reflow
     void el.offsetWidth;
     el.style.animation = '';
-
     document.getElementById('ov-count').textContent = `${wonCount} / ${MAX_W}`;
     document.getElementById('ov-next-btn').textContent =
       wonCount < MAX_W ? '次の抽選へ' : '当選者を発表！';
@@ -441,7 +460,6 @@
     }
   }
 
-  /* ---- 当選番号リスト更新 ---- */
   function updateWinnersList() {
     document.getElementById('winners-section').style.display = 'block';
     document.getElementById('winner-chips').innerHTML =
@@ -454,12 +472,11 @@
       r > 0 ? `残り ${r}枠` : '抽選完了';
   }
 
-  /* ---- 最終画面 ---- */
   function showFinalScreen() {
-    document.getElementById('spin-btn').style.display   = 'none';
+    document.getElementById('spin-btn').style.display        = 'none';
     document.getElementById('winners-section').style.display = 'none';
-    document.getElementById('reel-card').style.display  = 'none';
-    document.getElementById('prize-info').style.display = 'none';
+    document.getElementById('wheel-wrap').style.display      = 'none';
+    document.getElementById('prize-info').style.display      = 'none';
     document.getElementById('final-nums').innerHTML =
       decidedWinners.map(n => `<div class="final-num-chip">${escHtml(n)}</div>`).join('');
     document.getElementById('final-screen').style.display = 'block';
@@ -469,7 +486,8 @@
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
-  buildReel();
+  // 初期描画
+  drawWheel(0);
 </script>
 </body>
 </html>
