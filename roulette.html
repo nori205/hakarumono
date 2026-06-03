@@ -120,11 +120,27 @@
       font-size: 2rem; font-weight: 800;
       box-shadow: 0 3px 12px rgba(122,80,48,0.4);
     }
-    .final-message {
-      background: #7A5030; color: white;
-      border-radius: 50px; padding: 16px 24px;
-      font-size: 0.98rem; font-weight: bold;
+    .dm-wrap { margin-top: 10px; text-align: left; }
+    .dm-header {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
     }
+    .dm-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: #7A5030; color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.05rem; font-weight: 800; flex-shrink: 0;
+    }
+    .dm-name { font-size: 0.83rem; font-weight: 700; color: rgba(58,32,16,0.5); }
+    .dm-bubble {
+      background: #7A5030; color: white;
+      border-radius: 4px 22px 22px 22px;
+      padding: 22px 24px;
+      line-height: 1.8;
+      box-shadow: 0 4px 18px rgba(122,80,48,0.42);
+    }
+    .dm-congrats { font-size: 1.2rem; font-weight: 800; margin-bottom: 14px; }
+    .dm-nums-row { font-size: 1.55rem; font-weight: 800; letter-spacing: 0.06em; margin-bottom: 14px; }
+    .dm-detail { font-size: 0.95rem; opacity: 0.9; line-height: 1.75; }
 
     .overlay {
       display: none; position: fixed; inset: 0;
@@ -192,7 +208,17 @@
     <div class="final-card">
       <div class="final-nums" id="final-nums"></div>
     </div>
-    <div class="final-message">📩 Instagramで詳細をDMします</div>
+    <div class="dm-wrap">
+      <div class="dm-header">
+        <div class="dm-avatar">は</div>
+        <span class="dm-name">はかるもん</span>
+      </div>
+      <div class="dm-bubble">
+        <div class="dm-congrats">🎉 当選おめでとうございます！</div>
+        <div class="dm-nums-row" id="dm-nums-row"></div>
+        <div class="dm-detail">詳細はInstagramまたはThreadsの<br>DMにてお送りします📩</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -567,6 +593,8 @@
     document.getElementById('prize-info').style.display      = 'none';
     document.getElementById('final-nums').innerHTML =
       decidedWinners.map(n => `<div class="final-num-chip">${escHtml(n)}</div>`).join('');
+    document.getElementById('dm-nums-row').textContent =
+      '当選番号 ' + decidedWinners.join(' ');
     document.getElementById('final-screen').style.display = 'block';
   }
 
