@@ -635,6 +635,98 @@
       font-family: inherit;
       cursor: pointer;
     }
+
+    /* ---- 別型変換セクション ---- */
+    .cross-section { max-width: 500px; margin: 0 auto; padding: 0 16px 24px; }
+    .cross-toggle-btn {
+      width: 100%;
+      background: white;
+      border: 2px dashed rgba(192,130,97,0.45);
+      border-radius: 14px;
+      padding: 14px 16px;
+      color: #C08261;
+      font-size: 0.88rem;
+      font-weight: bold;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .cross-toggle-btn:active { background: #fdf5ef; }
+    .cross-card {
+      background: white;
+      border-radius: 16px;
+      padding: 16px;
+      margin-top: 10px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      display: none;
+    }
+    .cross-card.open { display: block; }
+    .cross-section-label {
+      font-size: 0.88rem;
+      font-weight: bold;
+      color: #3a2010;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(58,32,16,0.08);
+    }
+    .cross-arrow { text-align: center; font-size: 1.4rem; color: #C08261; margin: 10px 0; }
+    .cross-type-tabs {
+      display: flex;
+      background: #F5F0E8;
+      border-radius: 8px;
+      padding: 3px;
+      margin-bottom: 10px;
+      gap: 2px;
+    }
+    .cross-type-tab {
+      flex: 1;
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      padding: 5px 2px;
+      font-size: 0.7rem;
+      font-weight: bold;
+      font-family: inherit;
+      color: rgba(58,32,16,0.45);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .cross-type-tab.active { background: white; color: #C08261; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+    .cross-calc-btn {
+      width: 100%;
+      background: #C08261;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 1rem;
+      font-weight: bold;
+      font-family: inherit;
+      cursor: pointer;
+      margin-top: 14px;
+    }
+    .cross-calc-btn:active { background: #a0694d; }
+    .cross-error { color: #e53935; font-size: 0.82rem; margin-top: 8px; min-height: 18px; }
+    .cross-result {
+      background: linear-gradient(135deg, #fdf5ef 0%, #fff8f3 100%);
+      border: 1px solid rgba(192,130,97,0.2);
+      border-radius: 14px;
+      padding: 16px;
+      margin-top: 14px;
+      text-align: center;
+      display: none;
+    }
+    .cross-result.show { display: block; }
+    .cross-result-label { font-size: 0.75rem; color: rgba(58,32,16,0.5); margin-bottom: 4px; }
+    .cross-result-ratio { font-size: 2rem; font-weight: bold; color: #C08261; }
+    .cross-result-note { font-size: 0.8rem; color: rgba(58,32,16,0.6); margin-top: 4px; }
+    .cross-result-vols { display: flex; gap: 8px; margin-top: 12px; }
+    .cross-vol-chip { flex: 1; background: white; border-radius: 8px; padding: 8px; text-align: center; }
+    .cross-vol-chip .cvl { font-size: 0.7rem; color: rgba(58,32,16,0.5); }
+    .cross-vol-chip .cvn { font-size: 0.88rem; font-weight: bold; color: #C08261; margin-top: 2px; }
   </style>
 </head>
 <body>
@@ -750,6 +842,57 @@
   </div>
 
 
+</div>
+
+<!-- 別型変換セクション -->
+<div class="cross-section">
+  <button class="cross-toggle-btn" onclick="toggleCross()">
+    <span id="cross-toggle-icon">▼</span>&nbsp;異なる型に変換したい（パウンド→丸型など）
+  </button>
+  <div class="cross-card" id="cross-card">
+    <p style="font-size:0.78rem;color:rgba(58,32,16,0.4);margin-bottom:14px;line-height:1.6">レシピと違う種類の型を使いたいときの倍率計算です。<br>求めた倍率を材料の分量に掛けてください。</p>
+
+    <div class="cross-section-label">① もとの型（レシピの型）</div>
+    <div class="cross-type-tabs" id="x-recipe-tabs">
+      <button class="cross-type-tab active" onclick="setXType('recipe','round')">丸型</button>
+      <button class="cross-type-tab" onclick="setXType('recipe','chiffon')">シフォン</button>
+      <button class="cross-type-tab" onclick="setXType('recipe','square')">スクエア</button>
+      <button class="cross-type-tab" onclick="setXType('recipe','pound')">パウンド</button>
+      <button class="cross-type-tab" onclick="setXType('recipe','bread')">食パン</button>
+    </div>
+    <div id="x-recipe-inputs"></div>
+
+    <div class="cross-arrow">↓</div>
+
+    <div class="cross-section-label">② 変換したい型（自分の型）</div>
+    <div class="cross-type-tabs" id="x-mine-tabs">
+      <button class="cross-type-tab active" onclick="setXType('mine','round')">丸型</button>
+      <button class="cross-type-tab" onclick="setXType('mine','chiffon')">シフォン</button>
+      <button class="cross-type-tab" onclick="setXType('mine','square')">スクエア</button>
+      <button class="cross-type-tab" onclick="setXType('mine','pound')">パウンド</button>
+      <button class="cross-type-tab" onclick="setXType('mine','bread')">食パン</button>
+    </div>
+    <div id="x-mine-inputs"></div>
+
+    <div class="cross-error" id="x-error"></div>
+    <button class="cross-calc-btn" onclick="calculateX()">倍率を計算する</button>
+
+    <div class="cross-result" id="x-result">
+      <div class="cross-result-label">換算倍率</div>
+      <div class="cross-result-ratio" id="x-ratio-display"></div>
+      <div class="cross-result-note" id="x-note-display"></div>
+      <div class="cross-result-vols">
+        <div class="cross-vol-chip">
+          <div class="cvl">もとの型</div>
+          <div class="cvn" id="x-recipe-vol-display"></div>
+        </div>
+        <div class="cross-vol-chip">
+          <div class="cvl">変換したい型</div>
+          <div class="cvn" id="x-mine-vol-display"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- 材料名サジェスト -->
@@ -1545,6 +1688,204 @@
       e.target.value = '';
     };
     reader.readAsText(file);
+  }
+
+  /* ---- 別型変換 ---- */
+  let xRecipeType = 'round';
+  let xMineType   = 'round';
+  const xTypes = ['round', 'chiffon', 'square', 'pound', 'bread'];
+  const xState = {
+    recipe: {
+      round:   { mode: 'gou', gou: '', cm: '', height: 6 },
+      chiffon: { outer: '', inner: '', height: '' },
+      square:  { length: '', width: '', height: 5 },
+      pound:   { length: '', width: 8, height: 6 },
+      bread:   { mode: 'kin', kin: '', length: '', width: '', height: '' }
+    },
+    mine: {
+      round:   { mode: 'gou', gou: '', cm: '', height: 6 },
+      chiffon: { outer: '', inner: '', height: '' },
+      square:  { length: '', width: '', height: 5 },
+      pound:   { length: '', width: 8, height: 6 },
+      bread:   { mode: 'kin', kin: '', length: '', width: '', height: '' }
+    }
+  };
+
+  function toggleCross() {
+    const card = document.getElementById('cross-card');
+    const icon = document.getElementById('cross-toggle-icon');
+    const isOpen = card.classList.toggle('open');
+    icon.textContent = isOpen ? '▲' : '▼';
+    if (isOpen) { renderXInputs('recipe'); renderXInputs('mine'); }
+  }
+
+  function setXType(side, type) {
+    if (side === 'recipe') xRecipeType = type;
+    else xMineType = type;
+    document.querySelectorAll('#x-' + side + '-tabs .cross-type-tab').forEach((tab, i) => {
+      tab.classList.toggle('active', xTypes[i] === type);
+    });
+    renderXInputs(side);
+    document.getElementById('x-result').classList.remove('show');
+    document.getElementById('x-error').textContent = '';
+  }
+
+  function onXInput(side, type, key, value) {
+    xState[side][type][key] = value;
+  }
+
+  function setXRoundMode(side, mode) { xState[side].round.mode = mode; renderXInputs(side); }
+  function setXBreadMode(side, mode) { xState[side].bread.mode = mode; renderXInputs(side); }
+
+  function setXKin(side, kin) {
+    xState[side].bread.kin = kin;
+    if (kin && kinSizes[kin]) {
+      const sz = kinSizes[kin];
+      xState[side].bread.length = sz.length;
+      xState[side].bread.width  = sz.width;
+      xState[side].bread.height = sz.height;
+    } else {
+      xState[side].bread.length = '';
+      xState[side].bread.width  = '';
+      xState[side].bread.height = '';
+    }
+    renderXInputs(side);
+  }
+
+  function setXChiffonPreset(side, size) {
+    const sz = chiffonSizes[size];
+    if (!sz) return;
+    xState[side].chiffon.outer  = sz.outer;
+    xState[side].chiffon.inner  = sz.inner;
+    xState[side].chiffon.height = sz.height;
+    renderXInputs(side);
+  }
+
+  function renderXInputs(side) {
+    const type = side === 'recipe' ? xRecipeType : xMineType;
+    const s = xState[side][type];
+    const el = document.getElementById('x-' + side + '-inputs');
+    if (!el) return;
+
+    const ni = (key, ph, step, val) => {
+      const v = (val !== '' && val !== undefined && val !== null) ? val : '';
+      return `<input type="number" placeholder="${ph}" value="${v}" min="1" step="${step}"
+        oninput="onXInput('${side}','${type}','${key}',this.value)"
+        onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">`;
+    };
+
+    if (type === 'round') {
+      const isGou = s.mode !== 'cm';
+      el.innerHTML = `
+        <div class="toggle-row">
+          <button class="toggle-btn${isGou ? ' active' : ''}" onclick="setXRoundMode('${side}','gou')">号数で入力</button>
+          <button class="toggle-btn${!isGou ? ' active' : ''}" onclick="setXRoundMode('${side}','cm')">cmで入力</button>
+        </div>
+        ${isGou
+          ? `<div class="input-row"><label>号数</label>${ni('gou','例：6',1,s.gou)}<span class="unit">号</span></div>`
+          : `<div class="input-row"><label>直径</label>${ni('cm','例：18',0.5,s.cm)}<span class="unit">cm</span></div>`
+        }
+        <div class="input-row"><label>高さ</label>${ni('height','例：6',0.5,s.height)}<span class="unit">cm</span></div>`;
+
+    } else if (type === 'chiffon') {
+      el.innerHTML = `
+        <div class="toggle-row">
+          <button class="toggle-btn" style="font-size:0.8rem" onclick="setXChiffonPreset('${side}','15')">15cm</button>
+          <button class="toggle-btn" style="font-size:0.8rem" onclick="setXChiffonPreset('${side}','17')">17cm</button>
+          <button class="toggle-btn" style="font-size:0.8rem" onclick="setXChiffonPreset('${side}','20')">20cm</button>
+        </div>
+        <div class="auto-hint" style="text-align:left;padding:0 0 8px 0">サイズを選ぶか、直接入力してください</div>
+        <div class="input-row"><label>外径</label>${ni('outer','例：17',0.5,s.outer)}<span class="unit">cm</span></div>
+        <div class="input-row"><label>穴径</label>${ni('inner','例：5.5',0.5,s.inner)}<span class="unit">cm</span></div>
+        <div class="input-row"><label>高さ</label>${ni('height','例：9',0.5,s.height)}<span class="unit">cm</span></div>`;
+
+    } else if (type === 'square') {
+      el.innerHTML = `
+        <div class="input-row"><label>縦</label>${ni('length','例：18',0.5,s.length)}<span class="unit">cm</span></div>
+        <div class="input-row"><label>横</label>${ni('width','例：18',0.5,s.width)}<span class="unit">cm</span></div>
+        <div class="input-row"><label>高さ</label>${ni('height','例：5',0.5,s.height)}<span class="unit">cm</span></div>`;
+
+    } else if (type === 'pound') {
+      el.innerHTML = `
+        <div class="input-row"><label>長さ</label>${ni('length','例：17',0.5,s.length)}<span class="unit">cm</span></div>
+        <div class="input-row"><label>幅</label>${ni('width','例：8',0.5,s.width)}<span class="unit">cm</span></div>
+        <div class="input-row"><label>高さ</label>${ni('height','例：6',0.5,s.height)}<span class="unit">cm</span></div>`;
+
+    } else if (type === 'bread') {
+      const hasDims = s.mode === 'kin' ? !!s.kin : true;
+      el.innerHTML = `
+        <div class="toggle-row">
+          <button class="toggle-btn${s.mode === 'kin' ? ' active' : ''}" onclick="setXBreadMode('${side}','kin')">斤数で入力</button>
+          <button class="toggle-btn${s.mode === 'cm' ? ' active' : ''}" onclick="setXBreadMode('${side}','cm')">cmで入力</button>
+        </div>
+        ${s.mode === 'kin' ? `
+          <div class="input-row">
+            <label>斤数</label>
+            <select class="kin-select" onchange="setXKin('${side}',this.value)">
+              <option value=""${!s.kin ? ' selected' : ''}>-- 選択 --</option>
+              <option value="1"${s.kin == '1' ? ' selected' : ''}>1斤</option>
+              <option value="1.5"${s.kin == '1.5' ? ' selected' : ''}>1.5斤</option>
+              <option value="2"${s.kin == '2' ? ' selected' : ''}>2斤</option>
+            </select>
+          </div>
+          ${hasDims ? `
+            <div class="input-row"><label>長さ</label>${ni('length','',0.5,s.length)}<span class="unit">cm</span></div>
+            <div class="input-row"><label>横幅</label>${ni('width','',0.5,s.width)}<span class="unit">cm</span></div>
+            <div class="input-row"><label>高さ</label>${ni('height','',0.5,s.height)}<span class="unit">cm</span></div>
+          ` : ''}
+        ` : `
+          <div class="input-row"><label>長さ</label>${ni('length','例：20',0.5,s.length)}<span class="unit">cm</span></div>
+          <div class="input-row"><label>横幅</label>${ni('width','例：9',0.5,s.width)}<span class="unit">cm</span></div>
+          <div class="input-row"><label>高さ</label>${ni('height','例：9',0.5,s.height)}<span class="unit">cm</span></div>
+        `}`;
+    }
+  }
+
+  function getXVolume(type, s) {
+    if (type === 'round') {
+      let d;
+      if (s.mode === 'gou') {
+        const gou = parseFloat(s.gou);
+        if (!gou || gou <= 0) return null;
+        d = gou * 3;
+      } else {
+        d = parseFloat(s.cm);
+        if (!d || d <= 0) return null;
+      }
+      const h = parseFloat(s.height);
+      if (!h || h <= 0) return null;
+      return Math.PI * Math.pow(d / 2, 2) * h;
+    } else if (type === 'chiffon') {
+      const outer = parseFloat(s.outer);
+      const inner = parseFloat(s.inner);
+      const h     = parseFloat(s.height);
+      if (!outer || outer <= 0 || !inner || inner <= 0 || !h || h <= 0) return null;
+      if (inner >= outer) return null;
+      return Math.PI * (Math.pow(outer / 2, 2) - Math.pow(inner / 2, 2)) * h;
+    } else {
+      const l = parseFloat(s.length);
+      const w = parseFloat(s.width);
+      const h = parseFloat(s.height);
+      if (!l || l <= 0 || !w || w <= 0 || !h || h <= 0) return null;
+      return l * w * h;
+    }
+  }
+
+  function calculateX() {
+    const errEl = document.getElementById('x-error');
+    errEl.textContent = '';
+    const recipeVol = getXVolume(xRecipeType, xState.recipe[xRecipeType]);
+    const mineVol   = getXVolume(xMineType,   xState.mine[xMineType]);
+    if (recipeVol === null) { errEl.textContent = 'もとの型のサイズを入力してください。'; return; }
+    if (mineVol   === null) { errEl.textContent = '変換したい型のサイズを入力してください。'; return; }
+    const ratio = mineVol / recipeVol;
+    document.getElementById('x-ratio-display').textContent      = '×' + ratio.toFixed(2);
+    document.getElementById('x-note-display').textContent       = '変換したい型はもとの型より' + (ratio >= 1 ? '大きい' : '小さい') + '（全材料に ×' + ratio.toFixed(2) + ' する）';
+    document.getElementById('x-recipe-vol-display').textContent = Math.round(recipeVol) + ' cm³';
+    document.getElementById('x-mine-vol-display').textContent   = Math.round(mineVol)   + ' cm³';
+    const result = document.getElementById('x-result');
+    result.classList.add('show');
+    setTimeout(() => result.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
   }
 
   /* ---- 初期化 ---- */
