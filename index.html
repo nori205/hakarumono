@@ -2038,7 +2038,11 @@
     lastXRatio = ratio;
 
     const filled = xIngredients.filter(ing => ing.name.trim() || ing.amount !== '');
-    let ingHtml = filled.length > 0 ? filled.map(ing => {
+    if (filled.length === 0) {
+      errEl.textContent = '③ レシピの材料に材料を入力してください。';
+      return;
+    }
+    const ingHtml = filled.map(ing => {
       const orig = parseFloat(ing.amount);
       if (isNaN(orig) || orig <= 0) {
         return `<div class="result-ing-row">
@@ -2052,9 +2056,7 @@
         <span class="result-ing-name">${escHtml(ing.name) || '（名前なし）'}</span>
         <span class="result-ing-val">${adj}${unitLabel}</span>
       </div>`;
-    }).join('') : `<div class="result-ing-row">
-      <span class="result-ing-name" style="color:#aaa">材料を入力してください</span>
-    </div>`;
+    }).join('');
 
     document.getElementById('x-result-ing-list').innerHTML = ingHtml;
     const result = document.getElementById('x-result');
