@@ -859,6 +859,8 @@
     <span id="cross-toggle-icon">▼</span>&nbsp;異なる型に変換したい（パウンド→丸型など）
   </button>
   <div class="cross-card" id="cross-card">
+    <input class="recipe-name-input" type="text" id="x-recipe-name" placeholder="レシピ名（例：バナナパウンドケーキ）" style="margin-bottom:14px"
+      onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
     <div class="cross-section-label">① もとの型（レシピの型）</div>
     <div class="cross-type-tabs" id="x-recipe-tabs">
       <button class="cross-type-tab active" onclick="setXType('recipe','round')">丸型</button>
@@ -906,6 +908,7 @@
     <div class="cross-result" id="x-result">
       <div style="font-size:0.85rem;font-weight:bold;color:#3a2010;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(192,130,97,0.2)">換算後の材料</div>
       <div id="x-result-ing-list"></div>
+      <button class="save-recipe-btn" id="x-save-recipe-btn" onclick="saveXRecipe()">このレシピを保存する</button>
     </div>
   </div>
 </div>
@@ -1808,6 +1811,7 @@
   }
 
   /* ---- 別型変換 ---- */
+  let lastXRatio = null;
   let xRecipeType = 'round';
   let xMineType   = 'round';
   const xTypes = ['round', 'chiffon', 'square', 'pound', 'bread'];
@@ -2031,6 +2035,7 @@
     if (recipeVol === null) { errEl.textContent = 'もとの型のサイズを入力してください。'; return; }
     if (mineVol   === null) { errEl.textContent = '変換したい型のサイズを入力してください。'; return; }
     const ratio = mineVol / recipeVol;
+    lastXRatio = ratio;
 
     const filled = xIngredients.filter(ing => ing.name.trim() || ing.amount !== '');
     let ingHtml = filled.length > 0 ? filled.map(ing => {
@@ -2055,6 +2060,42 @@
     const result = document.getElementById('x-result');
     result.classList.add('show');
     setTimeout(() => result.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+  }
+
+  function saveXRecipe() {
+    const name = (document.getElementById('x-recipe-name').value || '').trim() || '名前なし';
+    const filled = xIngredients.filter(i => i.name.trim());
+    const convertedIngredients = lastXRatio ? filled.map(ing => {
+      const orig = parseFloat(ing.amount);
+      const adj = (!isNaN(orig) && orig > 0) ? formatAmount(orig * lastXRatio, ing.unit) : null;
+      return { name: ing.name, amount: adj, unit: (adj && adj !== '少々') ? ing.unit : '' };
+    }) : [];
+    const recipe = {
+      id: Date.now().toString(),
+      name,
+      memo: '',
+      bakingTime: '',
+      bakingTemp: '',
+      recipeType: xRecipeType,
+      mineType: xMineType,
+      recipeState: JSON.parse(JSON.stringify(xState.recipe[xRecipeType])),
+      mineState:   JSON.parse(JSON.stringify(xState.mine[xMineType])),
+      ingredients: JSON.parse(JSON.stringify(filled)),
+      convertedIngredients,
+      ratio: lastXRatio,
+      calcBakingTime: null,
+      recipeMoldLabel: getMoldLabel(xRecipeType, xState.recipe[xRecipeType]),
+      mineMoldLabel:   getMoldLabel(xMineType,   xState.mine[xMineType]),
+      savedAt: new Date().toLocaleDateString('ja-JP')
+    };
+    const recipes = getSavedRecipes();
+    recipes.unshift(recipe);
+    localStorage.setItem('saved_recipes', JSON.stringify(recipes));
+    filled.forEach(i => addToHistory(i.name));
+    const btn = document.getElementById('x-save-recipe-btn');
+    btn.textContent = '保存しました！';
+    btn.disabled = true;
+    setTimeout(() => { btn.textContent = 'このレシピを保存する'; btn.disabled = false; }, 2000);
   }
 
   /* ---- 初期化 ---- */
