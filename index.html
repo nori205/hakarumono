@@ -766,6 +766,15 @@
   <!-- レシピの材料 -->
   <div class="card">
     <h2>① レシピの材料</h2>
+    <div id="paste-area" style="display:none;margin-bottom:10px">
+      <textarea id="paste-input" class="memo-textarea" style="min-height:90px;font-size:0.85rem"
+        placeholder="レシピの材料をここに貼り付けてください&#10;&#10;例：&#10;薄力粉 100g&#10;砂糖 80g&#10;バター 60g&#10;卵 2個"></textarea>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <button onclick="applyPaste()" style="flex:2;padding:10px;background:#C08261;color:white;border:none;border-radius:8px;font-size:0.88rem;font-weight:bold;font-family:inherit;cursor:pointer">読み込む</button>
+        <button onclick="closePasteArea()" style="flex:1;padding:10px;background:white;color:#3a2010;border:1px solid rgba(58,32,16,0.2);border-radius:8px;font-size:0.88rem;font-family:inherit;cursor:pointer">キャンセル</button>
+      </div>
+    </div>
+    <button class="add-ing-btn" onclick="openPasteArea()" style="margin-bottom:10px">まとめて貼り付け</button>
     <div class="ingredient-header">
       <span style="flex:2">材料名</span>
       <span style="flex:1;text-align:right">分量</span>
@@ -850,8 +859,6 @@
     <span id="cross-toggle-icon">▼</span>&nbsp;異なる型に変換したい（パウンド→丸型など）
   </button>
   <div class="cross-card" id="cross-card">
-    <p style="font-size:0.78rem;color:rgba(58,32,16,0.4);margin-bottom:14px;line-height:1.6">レシピと違う種類の型を使いたいときの倍率計算です。<br>求めた倍率を材料の分量に掛けてください。</p>
-
     <div class="cross-section-label">① もとの型（レシピの型）</div>
     <div class="cross-type-tabs" id="x-recipe-tabs">
       <button class="cross-type-tab active" onclick="setXType('recipe','round')">丸型</button>
@@ -874,23 +881,31 @@
     </div>
     <div id="x-mine-inputs"></div>
 
+    <div class="cross-section-label" style="margin-top:14px">③ レシピの材料</div>
+    <div id="x-paste-area" style="display:none;margin-bottom:10px">
+      <textarea id="x-paste-input" class="memo-textarea" style="min-height:90px;font-size:0.85rem"
+        placeholder="レシピの材料をここに貼り付けてください&#10;&#10;例：&#10;薄力粉 100g&#10;砂糖 80g&#10;バター 60g&#10;卵 2個"></textarea>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <button onclick="applyXPaste()" style="flex:2;padding:10px;background:#C08261;color:white;border:none;border-radius:8px;font-size:0.88rem;font-weight:bold;font-family:inherit;cursor:pointer">読み込む</button>
+        <button onclick="closeXPasteArea()" style="flex:1;padding:10px;background:white;color:#3a2010;border:1px solid rgba(58,32,16,0.2);border-radius:8px;font-size:0.88rem;font-family:inherit;cursor:pointer">キャンセル</button>
+      </div>
+    </div>
+    <button class="add-ing-btn" onclick="openXPasteArea()" style="margin-bottom:8px">まとめて貼り付け</button>
+    <div class="ingredient-header">
+      <span style="flex:2">材料名</span>
+      <span style="flex:1;text-align:right">分量</span>
+      <span style="flex:0 0 62px;text-align:center">単位</span>
+      <span style="flex:0 0 28px"></span>
+    </div>
+    <div id="x-ingredients-list"></div>
+    <button class="add-ing-btn" onclick="addXIngredient()" style="margin-bottom:12px">＋ 材料を追加</button>
+
     <div class="cross-error" id="x-error"></div>
-    <button class="cross-calc-btn" onclick="calculateX()">倍率を計算する</button>
+    <button class="cross-calc-btn" onclick="calculateX()">材料を換算する</button>
 
     <div class="cross-result" id="x-result">
-      <div class="cross-result-label">換算倍率</div>
-      <div class="cross-result-ratio" id="x-ratio-display"></div>
-      <div class="cross-result-note" id="x-note-display"></div>
-      <div class="cross-result-vols">
-        <div class="cross-vol-chip">
-          <div class="cvl">もとの型</div>
-          <div class="cvn" id="x-recipe-vol-display"></div>
-        </div>
-        <div class="cross-vol-chip">
-          <div class="cvl">変換したい型</div>
-          <div class="cvn" id="x-mine-vol-display"></div>
-        </div>
-      </div>
+      <div style="font-size:0.85rem;font-weight:bold;color:#3a2010;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(192,130,97,0.2)">換算後の材料</div>
+      <div id="x-result-ing-list"></div>
     </div>
   </div>
 </div>
@@ -1337,7 +1352,8 @@
     }, 50);
   }
 
-  function updatePresetGrid() {} // 互換性のため残す
+  function updatePresetGrid() {}
+  function updateDatalist() {}
 
   function addIngredient() {
     ingredients.push({ name: '', amount: '', unit: 'g' });
@@ -1351,6 +1367,107 @@
 
   function removeIngredient(i) {
     if (ingredients.length > 1) { ingredients.splice(i, 1); renderIngredients(); }
+  }
+
+  /* ---- まとめて貼り付け ---- */
+  function parseIngredientLines(text) {
+    const UNITS = ['大さじ', '小さじ', 'カップ', 'ml', 'cc', 'kg', 'g', '個', '本', '枚'];
+    const NO_AMOUNT = ['少々', '適量', 'ひとつまみ', '少量', 'お好みで', '適宜'];
+
+    function parseFrac(s) {
+      if (s.includes('/')) {
+        const [a, b] = s.split('/');
+        return Math.round(parseFloat(a) / parseFloat(b) * 100) / 100;
+      }
+      return parseFloat(s);
+    }
+
+    const results = [];
+    for (let line of text.split(/[\n\r]+/).map(l => l.trim()).filter(Boolean)) {
+      // 全角数字→半角、分数文字変換
+      line = line.replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0));
+      line = line.replace(/½/g,'1/2').replace(/⅓/g,'1/3').replace(/¼/g,'1/4').replace(/¾/g,'3/4');
+      // 先頭の記号・番号を除去
+      line = line.replace(/^[・●◆■▶▼▲○◎★☆※\s]+/, '');
+      line = line.replace(/^[A-Za-z]\s+/, '');
+      line = line.replace(/^\d+[.、。\s]+/, '');
+      // 括弧内の注記除去
+      line = line.replace(/[（(][^）)]*[）)]/g, '');
+      line = line.replace(/[【】「」『』〔〕]/g, '').trim();
+
+      if (!line || line.length > 25) continue;
+
+      // 少々・適量など
+      if (NO_AMOUNT.some(w => line.includes(w))) {
+        const name = line.replace(new RegExp(NO_AMOUNT.join('|'), 'g'), '').replace(/[：:\s　]/g, '').trim();
+        if (name) results.push({ name, amount: '', unit: 'g' });
+        continue;
+      }
+
+      let found = false;
+      const N = '[\\d]+(?:[./][\\d]+)?';
+      for (const u of UNITS) {
+        // パターン1: 材料名 → 数字 → 単位
+        let m = line.match(new RegExp(`^(.+?)[\\s：:　]*(${N})\\s*${u}\\s*$`));
+        if (m) {
+          const name = m[1].trim();
+          const amt = parseFrac(m[2]);
+          if (name) { results.push({ name, amount: isNaN(amt) ? '' : String(amt), unit: u }); found = true; break; }
+        }
+        // パターン2: 材料名 → 単位 → 数字
+        m = line.match(new RegExp(`^(.+?)[\\s：:　]*${u}\\s*(${N})\\s*$`));
+        if (m) {
+          const name = m[1].trim();
+          const amt = parseFrac(m[2]);
+          if (name) { results.push({ name, amount: isNaN(amt) ? '' : String(amt), unit: u }); found = true; break; }
+        }
+      }
+
+      if (!found) {
+        // 数字だけ（単位不明）
+        const m = line.match(/^(.+?)\s+([\d.]+)\s*$/);
+        if (m && m[1].length <= 15) {
+          results.push({ name: m[1].trim(), amount: m[2], unit: 'g' });
+        } else if (line.length <= 15) {
+          results.push({ name: line, amount: '', unit: 'g' });
+        }
+      }
+    }
+    return results.filter(r => r.name.trim());
+  }
+
+  function openPasteArea() {
+    document.getElementById('paste-area').style.display = 'block';
+    document.getElementById('paste-input').focus();
+  }
+  function closePasteArea() {
+    document.getElementById('paste-area').style.display = 'none';
+    document.getElementById('paste-input').value = '';
+  }
+  function applyPaste() {
+    const text = document.getElementById('paste-input').value;
+    const parsed = parseIngredientLines(text);
+    if (parsed.length === 0) { alert('材料を読み取れませんでした。\n「材料名 分量 単位」の形式で入力してください。'); return; }
+    ingredients = parsed.length > 0 ? parsed : [{ name: '', amount: '', unit: 'g' }];
+    renderIngredients();
+    closePasteArea();
+  }
+
+  function openXPasteArea() {
+    document.getElementById('x-paste-area').style.display = 'block';
+    document.getElementById('x-paste-input').focus();
+  }
+  function closeXPasteArea() {
+    document.getElementById('x-paste-area').style.display = 'none';
+    document.getElementById('x-paste-input').value = '';
+  }
+  function applyXPaste() {
+    const text = document.getElementById('x-paste-input').value;
+    const parsed = parseIngredientLines(text);
+    if (parsed.length === 0) { alert('材料を読み取れませんでした。\n「材料名 分量 単位」の形式で入力してください。'); return; }
+    xIngredients = parsed.length > 0 ? parsed : [{ name: '', amount: '', unit: 'g' }];
+    renderXIngredients();
+    closeXPasteArea();
   }
 
   function escHtml(str) {
@@ -1716,7 +1833,7 @@
     const icon = document.getElementById('cross-toggle-icon');
     const isOpen = card.classList.toggle('open');
     icon.textContent = isOpen ? '▲' : '▼';
-    if (isOpen) { renderXInputs('recipe'); renderXInputs('mine'); }
+    if (isOpen) { renderXInputs('recipe'); renderXInputs('mine'); renderXIngredients(); }
   }
 
   function setXType(side, type) {
@@ -1871,6 +1988,41 @@
     }
   }
 
+  let xIngredients = [
+    { name: '', amount: '', unit: 'g' },
+    { name: '', amount: '', unit: 'g' },
+    { name: '', amount: '', unit: 'g' },
+  ];
+
+  function renderXIngredients() {
+    const el = document.getElementById('x-ingredients-list');
+    if (!el) return;
+    el.innerHTML = xIngredients.map((ing, i) => `
+      <div class="ingredient-row">
+        <input class="ing-name" type="text" placeholder="例：薄力粉" value="${escHtml(ing.name)}"
+          oninput="xIngredients[${i}].name=this.value"
+          onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+        <input class="ing-amount" type="number" placeholder="100" value="${ing.amount}"
+          min="0" step="any"
+          oninput="xIngredients[${i}].amount=this.value"
+          onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+        <select class="ing-unit" onchange="xIngredients[${i}].unit=this.value">
+          ${UNITS.map(u => `<option value="${u}"${ing.unit===u?' selected':''}>${u}</option>`).join('')}
+        </select>
+        <button class="ing-del" onclick="removeXIngredient(${i})">×</button>
+      </div>
+    `).join('');
+  }
+
+  function addXIngredient() {
+    xIngredients.push({ name: '', amount: '', unit: 'g' });
+    renderXIngredients();
+  }
+
+  function removeXIngredient(i) {
+    if (xIngredients.length > 1) { xIngredients.splice(i, 1); renderXIngredients(); }
+  }
+
   function calculateX() {
     const errEl = document.getElementById('x-error');
     errEl.textContent = '';
@@ -1879,10 +2031,27 @@
     if (recipeVol === null) { errEl.textContent = 'もとの型のサイズを入力してください。'; return; }
     if (mineVol   === null) { errEl.textContent = '変換したい型のサイズを入力してください。'; return; }
     const ratio = mineVol / recipeVol;
-    document.getElementById('x-ratio-display').textContent      = '×' + ratio.toFixed(2);
-    document.getElementById('x-note-display').textContent       = '変換したい型はもとの型より' + (ratio >= 1 ? '大きい' : '小さい') + '（全材料に ×' + ratio.toFixed(2) + ' する）';
-    document.getElementById('x-recipe-vol-display').textContent = Math.round(recipeVol) + ' cm³';
-    document.getElementById('x-mine-vol-display').textContent   = Math.round(mineVol)   + ' cm³';
+
+    const filled = xIngredients.filter(ing => ing.name.trim() || ing.amount !== '');
+    let ingHtml = filled.length > 0 ? filled.map(ing => {
+      const orig = parseFloat(ing.amount);
+      if (isNaN(orig) || orig <= 0) {
+        return `<div class="result-ing-row">
+          <span class="result-ing-name">${escHtml(ing.name) || '（名前なし）'}</span>
+          <span class="result-ing-val" style="color:#bbb">分量未入力</span>
+        </div>`;
+      }
+      const adj = formatAmount(orig * ratio, ing.unit);
+      const unitLabel = adj === '少々' ? '' : ' ' + ing.unit;
+      return `<div class="result-ing-row">
+        <span class="result-ing-name">${escHtml(ing.name) || '（名前なし）'}</span>
+        <span class="result-ing-val">${adj}${unitLabel}</span>
+      </div>`;
+    }).join('') : `<div class="result-ing-row">
+      <span class="result-ing-name" style="color:#aaa">材料を入力してください</span>
+    </div>`;
+
+    document.getElementById('x-result-ing-list').innerHTML = ingHtml;
     const result = document.getElementById('x-result');
     result.classList.add('show');
     setTimeout(() => result.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
