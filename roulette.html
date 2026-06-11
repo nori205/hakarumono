@@ -232,7 +232,6 @@
 
 <script>
   const NUMS    = ['②','③','④','⑤','⑥','⑦','⑧','⑨','⑩'];
-  const WIN_NUMS = ['②','③','④','⑦','⑧'];
   const SEG_DEG = 360 / NUMS.length; // 40°
   const MAX_W   = 5;
 
@@ -252,7 +251,6 @@
     { bg: '#D4B896', text: '#5a2c0a' },
   ];
 
-  let shuffledWinners = [...WIN_NUMS].sort(() => Math.random() - 0.5);
   let wonCount       = 0;
   let decidedWinners = [];
   let wheelAngle     = 0;
@@ -457,8 +455,8 @@
     spinning = true;
     document.getElementById('spin-btn').disabled = true;
 
-    const targetNum = shuffledWinners[wonCount];
-    const targetIdx = NUMS.indexOf(targetNum);
+    const targetIdx = Math.floor(Math.random() * NUMS.length);
+    const targetNum = NUMS[targetIdx];
 
     const targetMod  = ((340 - targetIdx * SEG_DEG) % 360 + 360) % 360;
     const currentMod = ((wheelAngle % 360) + 360) % 360;
