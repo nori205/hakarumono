@@ -727,6 +727,55 @@
     .cross-vol-chip { flex: 1; background: white; border-radius: 8px; padding: 8px; text-align: center; }
     .cross-vol-chip .cvl { font-size: 0.7rem; color: rgba(58,32,16,0.5); }
     .cross-vol-chip .cvn { font-size: 0.88rem; font-weight: bold; color: #C08261; margin-top: 2px; }
+    /* ---- 倍率計算 ---- */
+    .sc-ratio-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .sc-ratio-btn {
+      padding: 10px 4px;
+      border: 2px solid #C08261;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-weight: bold;
+      background: white;
+      color: #C08261;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .sc-ratio-btn.active { background: #C08261; color: white; }
+    .sc-ratio-input-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .sc-ratio-input {
+      flex: 1;
+      padding: 11px 10px;
+      border: 1px solid rgba(58,32,16,0.2);
+      border-radius: 8px;
+      font-size: 1rem;
+      text-align: right;
+      background: white;
+      font-family: inherit;
+      color: #3a2010;
+    }
+    .sc-ratio-input:focus { outline: none; border-color: #C08261; }
+    .sc-result-header {
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #3a2010;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(192,130,97,0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
   </style>
 </head>
 <body>
@@ -769,7 +818,10 @@
     <div id="paste-area" style="display:none;margin-bottom:10px">
       <textarea id="paste-input" class="memo-textarea" style="min-height:90px;font-size:0.85rem"
         placeholder="レシピの材料をここに貼り付けてください&#10;&#10;例：&#10;薄力粉 100g&#10;砂糖 80g&#10;バター 60g&#10;卵 2個"></textarea>
-      <div style="display:flex;gap:8px;margin-top:6px">
+      <p style="font-size:0.75rem;color:rgba(58,32,16,0.5);margin:6px 0;line-height:1.5">
+        ※ クックパッドのレシピはほぼそのまま貼れます。手書きメモは正しく取れないことがあるので、読み込み後に確認してください。
+      </p>
+      <div style="display:flex;gap:8px;margin-top:4px">
         <button onclick="applyPaste()" style="flex:2;padding:10px;background:#C08261;color:white;border:none;border-radius:8px;font-size:0.88rem;font-weight:bold;font-family:inherit;cursor:pointer">読み込む</button>
         <button onclick="closePasteArea()" style="flex:1;padding:10px;background:white;color:#3a2010;border:1px solid rgba(58,32,16,0.2);border-radius:8px;font-size:0.88rem;font-family:inherit;cursor:pointer">キャンセル</button>
       </div>
@@ -887,7 +939,10 @@
     <div id="x-paste-area" style="display:none;margin-bottom:10px">
       <textarea id="x-paste-input" class="memo-textarea" style="min-height:90px;font-size:0.85rem"
         placeholder="レシピの材料をここに貼り付けてください&#10;&#10;例：&#10;薄力粉 100g&#10;砂糖 80g&#10;バター 60g&#10;卵 2個"></textarea>
-      <div style="display:flex;gap:8px;margin-top:6px">
+      <p style="font-size:0.75rem;color:rgba(58,32,16,0.5);margin:6px 0;line-height:1.5">
+        ※ クックパッドのレシピはほぼそのまま貼れます。手書きメモは正しく取れないことがあるので、読み込み後に確認してください。
+      </p>
+      <div style="display:flex;gap:8px;margin-top:4px">
         <button onclick="applyXPaste()" style="flex:2;padding:10px;background:#C08261;color:white;border:none;border-radius:8px;font-size:0.88rem;font-weight:bold;font-family:inherit;cursor:pointer">読み込む</button>
         <button onclick="closeXPasteArea()" style="flex:1;padding:10px;background:white;color:#3a2010;border:1px solid rgba(58,32,16,0.2);border-radius:8px;font-size:0.88rem;font-family:inherit;cursor:pointer">キャンセル</button>
       </div>
@@ -910,6 +965,73 @@
       <div id="x-result-ing-list"></div>
       <button class="save-recipe-btn" id="x-save-recipe-btn" onclick="saveXRecipe()">このレシピを保存する</button>
     </div>
+  </div>
+</div>
+
+<!-- 倍率計算セクション -->
+<div class="cross-section" style="padding-top:0;margin-top:10px">
+  <button class="cross-toggle-btn" onclick="toggleScaleCalc()">
+    <span id="sc-toggle-icon">▼</span>&nbsp;分量を倍率で計算する（2倍・3/4など）
+  </button>
+  <div class="cross-card" id="sc-card">
+
+    <div class="cross-section-label">① 基本レシピの材料</div>
+    <div id="sc-paste-area" style="display:none;margin-bottom:10px">
+      <textarea id="sc-paste-input" class="memo-textarea" style="min-height:90px;font-size:0.85rem"
+        placeholder="レシピの材料をここに貼り付けてください&#10;&#10;例：&#10;薄力粉 100g&#10;砂糖 80g&#10;バター 60g&#10;卵 2個"></textarea>
+      <p style="font-size:0.75rem;color:rgba(58,32,16,0.5);margin:6px 0;line-height:1.5">
+        ※ クックパッドのレシピはほぼそのまま貼れます。手書きメモは正しく取れないことがあるので、読み込み後に確認してください。
+      </p>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button onclick="applyScPaste()" style="flex:2;padding:10px;background:#C08261;color:white;border:none;border-radius:8px;font-size:0.88rem;font-weight:bold;font-family:inherit;cursor:pointer">読み込む</button>
+        <button onclick="closeScPasteArea()" style="flex:1;padding:10px;background:white;color:#3a2010;border:1px solid rgba(58,32,16,0.2);border-radius:8px;font-size:0.88rem;font-family:inherit;cursor:pointer">キャンセル</button>
+      </div>
+    </div>
+    <button class="add-ing-btn" onclick="openScPasteArea()" style="margin-bottom:8px">まとめて貼り付け</button>
+    <div class="ingredient-header">
+      <span style="flex:2">材料名</span>
+      <span style="flex:1;text-align:right">分量</span>
+      <span style="flex:0 0 62px;text-align:center">単位</span>
+      <span style="flex:0 0 28px"></span>
+    </div>
+    <div id="sc-ingredients-list"></div>
+    <button class="add-ing-btn" onclick="addScIngredient()" style="margin-bottom:16px">＋ 材料を追加</button>
+
+    <div class="cross-section-label">② 倍率を選ぶ</div>
+    <div class="sc-ratio-grid">
+      <button class="sc-ratio-btn" data-ratio="0.5"  onclick="setScRatio(0.5)">×1/2</button>
+      <button class="sc-ratio-btn" data-ratio="0.75" onclick="setScRatio(0.75)">×3/4</button>
+      <button class="sc-ratio-btn" data-ratio="1.5"  onclick="setScRatio(1.5)">×1.5</button>
+      <button class="sc-ratio-btn" data-ratio="2"    onclick="setScRatio(2)">×2</button>
+      <button class="sc-ratio-btn" data-ratio="3"    onclick="setScRatio(3)">×3</button>
+      <button class="sc-ratio-btn" data-ratio="4"    onclick="setScRatio(4)">×4</button>
+    </div>
+    <div class="sc-ratio-input-row">
+      <span style="font-size:0.9rem;color:#3a2010;font-weight:bold">×</span>
+      <input type="number" id="sc-ratio-input" class="sc-ratio-input"
+        placeholder="例：0.75" min="0.01" step="0.01"
+        oninput="onScRatioInput(this.value)"
+        onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+      <span style="font-size:0.85rem;color:rgba(58,32,16,0.5)">倍（自由入力）</span>
+    </div>
+
+    <div class="cross-error" id="sc-error"></div>
+    <button class="cross-calc-btn" onclick="calculateScaleCalc()">分量を計算する</button>
+
+    <div class="cross-result" id="sc-result">
+      <div class="sc-result-header">
+        <span>計算後の分量</span>
+        <span id="sc-ratio-note" style="font-size:0.8rem;color:rgba(58,32,16,0.45)"></span>
+      </div>
+      <div class="scale-row" style="margin-bottom:10px">
+        <span class="scale-label">はかりの単位：</span>
+        <button class="scale-btn sc-scale-btn active" data-scale="1"   onclick="setScScale(1)">1g</button>
+        <button class="scale-btn sc-scale-btn"        data-scale="0.5" onclick="setScScale(0.5)">0.5g</button>
+        <button class="scale-btn sc-scale-btn"        data-scale="0.1" onclick="setScScale(0.1)">0.1g</button>
+      </div>
+      <div id="sc-result-ing-list"></div>
+    </div>
+
   </div>
 </div>
 
@@ -2098,6 +2220,148 @@
     btn.textContent = '保存しました！';
     btn.disabled = true;
     setTimeout(() => { btn.textContent = 'このレシピを保存する'; btn.disabled = false; }, 2000);
+  }
+
+  /* ---- 倍率計算 ---- */
+  let scIngredients = [
+    { name: '', amount: '', unit: 'g' },
+    { name: '', amount: '', unit: 'g' },
+    { name: '', amount: '', unit: 'g' },
+  ];
+  let scRatioValue = null;
+  let scScaleUnit = 1;
+
+  function toggleScaleCalc() {
+    const card = document.getElementById('sc-card');
+    const icon = document.getElementById('sc-toggle-icon');
+    const isOpen = card.classList.toggle('open');
+    icon.textContent = isOpen ? '▲' : '▼';
+    if (isOpen) renderScIngredients();
+  }
+
+  function renderScIngredients() {
+    const el = document.getElementById('sc-ingredients-list');
+    if (!el) return;
+    el.innerHTML = scIngredients.map((ing, i) => `
+      <div class="ingredient-row">
+        <input class="ing-name" type="text" placeholder="例：薄力粉" value="${escHtml(ing.name)}"
+          oninput="scIngredients[${i}].name=this.value"
+          onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+        <input class="ing-amount" type="number" placeholder="100" value="${ing.amount}"
+          min="0" step="any"
+          oninput="scIngredients[${i}].amount=this.value"
+          onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+        <select class="ing-unit" onchange="scIngredients[${i}].unit=this.value">
+          ${UNITS.map(u => `<option value="${u}"${ing.unit===u?' selected':''}>${u}</option>`).join('')}
+        </select>
+        <button class="ing-del" onclick="removeScIngredient(${i})">×</button>
+      </div>
+    `).join('');
+  }
+
+  function addScIngredient() {
+    scIngredients.push({ name: '', amount: '', unit: 'g' });
+    renderScIngredients();
+  }
+
+  function removeScIngredient(i) {
+    if (scIngredients.length > 1) { scIngredients.splice(i, 1); renderScIngredients(); }
+  }
+
+  function openScPasteArea() {
+    document.getElementById('sc-paste-area').style.display = 'block';
+    document.getElementById('sc-paste-input').focus();
+  }
+  function closeScPasteArea() {
+    document.getElementById('sc-paste-area').style.display = 'none';
+    document.getElementById('sc-paste-input').value = '';
+  }
+  function applyScPaste() {
+    const text = document.getElementById('sc-paste-input').value;
+    const parsed = parseIngredientLines(text);
+    if (parsed.length === 0) {
+      alert('材料を読み取れませんでした。\n手動で入力するか、形式を確認してください。');
+      return;
+    }
+    scIngredients = parsed;
+    renderScIngredients();
+    closeScPasteArea();
+  }
+
+  function setScRatio(val) {
+    scRatioValue = val;
+    document.getElementById('sc-ratio-input').value = val;
+    document.querySelectorAll('.sc-ratio-btn').forEach(btn => {
+      btn.classList.toggle('active', parseFloat(btn.dataset.ratio) === val);
+    });
+  }
+
+  function onScRatioInput(val) {
+    const v = parseFloat(val);
+    scRatioValue = isNaN(v) ? null : v;
+    document.querySelectorAll('.sc-ratio-btn').forEach(btn => {
+      btn.classList.toggle('active', parseFloat(btn.dataset.ratio) === v);
+    });
+  }
+
+  function setScScale(val) {
+    scScaleUnit = val;
+    document.querySelectorAll('.sc-scale-btn').forEach(btn => {
+      btn.classList.toggle('active', parseFloat(btn.dataset.scale) === val);
+    });
+    if (document.getElementById('sc-result').classList.contains('show')) calculateScaleCalc();
+  }
+
+  function calculateScaleCalc() {
+    const errEl = document.getElementById('sc-error');
+    errEl.textContent = '';
+    if (!scRatioValue || scRatioValue <= 0) {
+      errEl.textContent = '② 倍率を選ぶか、数値を入力してください。';
+      return;
+    }
+    const filled = scIngredients.filter(ing => ing.name.trim() || ing.amount !== '');
+    if (filled.length === 0) {
+      errEl.textContent = '① 材料を入力してください。';
+      return;
+    }
+    const ingHtml = filled.map(ing => {
+      const orig = parseFloat(ing.amount);
+      if (isNaN(orig) || orig <= 0) {
+        return `<div class="result-ing-row">
+          <span class="result-ing-name">${escHtml(ing.name) || '（名前なし）'}</span>
+          <span class="result-ing-val" style="color:#bbb">分量未入力</span>
+        </div>`;
+      }
+      const adj = formatScAmount(orig * scRatioValue, ing.unit);
+      const unitLabel = adj === '少々' ? '' : ' ' + ing.unit;
+      return `<div class="result-ing-row">
+        <span class="result-ing-name">${escHtml(ing.name) || '（名前なし）'}</span>
+        <span class="result-ing-val">${adj}${unitLabel}</span>
+      </div>`;
+    }).join('');
+
+    document.getElementById('sc-ratio-note').textContent = '×' + scRatioValue + '倍で計算';
+    document.getElementById('sc-result-ing-list').innerHTML = ingHtml;
+    const result = document.getElementById('sc-result');
+    result.classList.add('show');
+    setTimeout(() => result.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+  }
+
+  function formatScAmount(val, unit) {
+    if (['g', 'ml', 'cc'].includes(unit)) {
+      const rounded = Math.round(val / scScaleUnit) * scScaleUnit;
+      if (rounded < scScaleUnit) return '少々';
+      const decimals = scScaleUnit < 1 ? 1 : 0;
+      return rounded.toFixed(decimals).replace(/\.0$/, '');
+    }
+    if (['個', '本', '枚'].includes(unit)) {
+      const r = Math.round(val * 10) / 10;
+      if (r % 1 === 0) return r.toString();
+      return '約' + r.toFixed(1);
+    }
+    if (val >= 100) return Math.round(val).toString();
+    if (val >= 10) return (Math.round(val * 10) / 10).toString();
+    return (Math.round(val * 100) / 100).toString();
   }
 
   /* ---- 初期化 ---- */
