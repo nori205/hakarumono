@@ -1007,13 +1007,14 @@
       <button class="sc-ratio-btn" data-ratio="4"    onclick="setScRatio(4)">×4</button>
     </div>
     <div class="sc-ratio-input-row">
-      <span style="font-size:0.9rem;color:#3a2010;font-weight:bold">×</span>
+      <span style="font-size:0.9rem;color:#3a2010;font-weight:bold;flex-shrink:0">×</span>
       <input type="number" id="sc-ratio-input" class="sc-ratio-input"
         placeholder="例：0.75" min="0.01" step="0.01"
         oninput="onScRatioInput(this.value)"
         onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
-      <span style="font-size:0.85rem;color:rgba(58,32,16,0.5)">倍（自由入力）</span>
+      <span style="font-size:0.9rem;color:#3a2010;flex-shrink:0">倍</span>
     </div>
+    <p style="font-size:0.75rem;color:rgba(58,32,16,0.45);margin-top:-4px;margin-bottom:8px">上のボタン以外の倍率はここに直接入力できます</p>
 
     <div class="cross-error" id="sc-error"></div>
     <button class="cross-calc-btn" onclick="calculateScaleCalc()">分量を計算する</button>
