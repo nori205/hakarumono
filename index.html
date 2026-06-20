@@ -727,6 +727,25 @@
     .cross-vol-chip { flex: 1; background: white; border-radius: 8px; padding: 8px; text-align: center; }
     .cross-vol-chip .cvl { font-size: 0.7rem; color: rgba(58,32,16,0.5); }
     .cross-vol-chip .cvn { font-size: 0.88rem; font-weight: bold; color: #C08261; margin-top: 2px; }
+
+    /* ---- メインタブ ---- */
+    .main-tabs { display: flex; background: #B07050; padding: 0 12px; }
+    .main-tab { flex: 1; padding: 10px 4px; border: none; background: transparent; color: rgba(255,255,255,0.6); font-size: 0.9rem; font-weight: bold; font-family: inherit; cursor: pointer; border-bottom: 3px solid transparent; }
+    .main-tab.active { color: white; border-bottom-color: white; }
+
+    /* ---- 完成品カード ---- */
+    .completed-recipe-card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .crc-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px; }
+    .crc-name { font-size: 1.05rem; font-weight: bold; color: #3a2010; }
+    .crc-del { border: none; background: transparent; color: #ccc; font-size: 0.78rem; cursor: pointer; padding: 4px 8px; }
+    .crc-del:active { color: #e57373; }
+    .crc-mold { font-size: 0.75rem; color: rgba(58,32,16,0.45); margin-bottom: 10px; }
+    .crc-bake { font-size: 0.88rem; font-weight: bold; color: #C08261; margin: 8px 0; padding: 8px 12px; background: rgba(192,130,97,0.1); border-radius: 8px; }
+    .crc-memo { font-size: 0.82rem; color: #3a2010; line-height: 1.65; white-space: pre-wrap; margin-top: 8px; padding: 8px 10px; background: #F5F0E8; border-radius: 8px; }
+    .crc-load-btn { width: 100%; padding: 10px; background: #C08261; color: white; border: none; border-radius: 8px; font-size: 0.88rem; font-weight: bold; font-family: inherit; cursor: pointer; margin-top: 12px; }
+    .crc-load-btn:active { background: #a86e50; }
+    .output-scale-row { display: flex; align-items: center; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+
     /* ---- 倍率計算 ---- */
     .sc-ratio-grid {
       display: grid;
@@ -792,9 +811,15 @@
     <h1>はかるもん</h1>
     <p>レシピの型と手持ちの型を入力して材料を自動換算</p>
   </div>
-  <button class="saved-btn" onclick="openSavedRecipes()">保存済み</button>
+  <div style="width:52px;flex-shrink:0"></div>
 </header>
 
+<div class="main-tabs">
+  <button class="main-tab active" onclick="switchMainTab('input')">レシピ入力</button>
+  <button class="main-tab" onclick="switchMainTab('output')">完成品</button>
+</div>
+
+<div id="tab-input">
 <div class="container">
 
   <!-- 型の種類タブ -->
@@ -959,12 +984,40 @@
     <div id="x-ingredients-list"></div>
     <button class="add-ing-btn" onclick="addXIngredient()" style="margin-bottom:12px">＋ 材料を追加</button>
 
+    <div class="cross-section-label" style="margin-top:12px">④ 焼き時間（任意）</div>
+    <div style="display:flex;gap:8px;margin-bottom:4px">
+      <div class="input-row" style="flex:1;margin:0">
+        <label style="flex:0 0 56px">焼き時間</label>
+        <input type="number" id="x-baking-time" placeholder="例：35" min="1" step="1"
+          style="flex:1;min-width:0;padding:10px 8px;border:1px solid rgba(58,32,16,0.2);border-radius:8px;font-size:0.95rem;text-align:right;background:white;font-family:inherit;color:#3a2010"
+          onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+        <span class="unit">分</span>
+      </div>
+      <div class="input-row" style="flex:1;margin:0">
+        <label style="flex:0 0 36px">温度</label>
+        <input type="number" id="x-baking-temp" placeholder="例：180" min="100" step="10"
+          style="flex:1;min-width:0;padding:10px 8px;border:1px solid rgba(58,32,16,0.2);border-radius:8px;font-size:0.95rem;text-align:right;background:white;font-family:inherit;color:#3a2010"
+          onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+        <span class="unit">℃</span>
+      </div>
+    </div>
+    <p style="font-size:0.75rem;color:rgba(58,32,16,0.4);margin-bottom:12px">型の深さの変化から焼き時間の目安を算出します</p>
+
     <div class="cross-error" id="x-error"></div>
     <button class="cross-calc-btn" onclick="calculateX()">材料を換算する</button>
 
     <div class="cross-result" id="x-result">
       <div style="font-size:0.85rem;font-weight:bold;color:#3a2010;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(192,130,97,0.2)">換算後の材料</div>
       <div id="x-result-ing-list"></div>
+      <div id="x-bake-result" style="display:none;margin:10px 0;padding:10px 14px;background:white;border-radius:10px">
+        <div style="font-size:0.78rem;color:rgba(58,32,16,0.5);margin-bottom:4px">焼き時間の目安</div>
+        <div style="display:flex;align-items:baseline;gap:4px">
+          <span style="font-size:1.4rem;font-weight:bold;color:#C08261" id="x-bake-num"></span>
+          <span style="font-size:0.88rem;color:#3a2010">分</span>
+          <span style="font-size:0.82rem;color:rgba(58,32,16,0.6);margin-left:8px" id="x-bake-temp"></span>
+        </div>
+        <div style="font-size:0.72rem;color:rgba(58,32,16,0.45);margin-top:6px;line-height:1.5">※ 型の深さの比率から算出した目安です。実際には様子を見ながら調整してください。</div>
+      </div>
       <button class="save-recipe-btn" id="x-save-recipe-btn" onclick="saveXRecipe()">このレシピを保存する</button>
     </div>
   </div>
@@ -1018,6 +1071,25 @@
     </div>
     <p style="font-size:0.75rem;color:rgba(58,32,16,0.45);margin-top:-4px;margin-bottom:8px">上のボタン以外の倍率はここに直接入力できます</p>
 
+    <div class="cross-section-label" style="margin-top:12px">③ 焼き時間（任意）</div>
+    <div style="display:flex;gap:8px;margin-bottom:4px">
+      <div class="input-row" style="flex:1;margin:0">
+        <label style="flex:0 0 56px">焼き時間</label>
+        <input type="number" id="sc-baking-time" placeholder="例：35" min="1" step="1"
+          style="flex:1;min-width:0;padding:10px 8px;border:1px solid rgba(58,32,16,0.2);border-radius:8px;font-size:0.95rem;text-align:right;background:white;font-family:inherit;color:#3a2010"
+          onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+        <span class="unit">分</span>
+      </div>
+      <div class="input-row" style="flex:1;margin:0">
+        <label style="flex:0 0 36px">温度</label>
+        <input type="number" id="sc-baking-temp" placeholder="例：180" min="100" step="10"
+          style="flex:1;min-width:0;padding:10px 8px;border:1px solid rgba(58,32,16,0.2);border-radius:8px;font-size:0.95rem;text-align:right;background:white;font-family:inherit;color:#3a2010"
+          onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+        <span class="unit">℃</span>
+      </div>
+    </div>
+    <p style="font-size:0.75rem;color:rgba(58,32,16,0.4);margin-bottom:12px">材料の倍率変更のみでは焼き時間は基本的に変わりません。参考として表示します</p>
+
     <div class="cross-error" id="sc-error"></div>
     <button class="cross-calc-btn" onclick="calculateScaleCalc()">分量を計算する</button>
 
@@ -1033,12 +1105,32 @@
         <button class="scale-btn sc-scale-btn"        data-scale="0.1" onclick="setScScale(0.1)">0.1g</button>
       </div>
       <div id="sc-result-ing-list"></div>
+      <div id="sc-bake-result" style="display:none;margin-top:10px;padding:10px 14px;background:white;border-radius:10px">
+        <div style="font-size:0.78rem;color:rgba(58,32,16,0.5);margin-bottom:4px">焼き時間の参考</div>
+        <div style="display:flex;align-items:baseline;gap:4px">
+          <span style="font-size:1.4rem;font-weight:bold;color:#C08261" id="sc-bake-num"></span>
+          <span style="font-size:0.88rem;color:#3a2010">分</span>
+          <span style="font-size:0.82rem;color:rgba(58,32,16,0.6);margin-left:8px" id="sc-bake-temp"></span>
+        </div>
+        <div style="font-size:0.72rem;color:rgba(58,32,16,0.45);margin-top:6px;line-height:1.5">※ 材料の倍率を変えるだけでは焼き時間は変わりません。型のサイズが同じ場合はレシピ通りで大丈夫です。</div>
+      </div>
     </div>
 
   </div>
 </div>
+</div><!-- /tab-input -->
 
-<!-- 材料名サジェスト -->
+<div id="tab-output" style="display:none">
+  <div class="container">
+    <div class="output-scale-row">
+      <span class="scale-label">はかりの単位：</span>
+      <button class="scale-btn output-scale-btn active" onclick="setOutputScale(1)">1g</button>
+      <button class="scale-btn output-scale-btn" onclick="setOutputScale(0.5)">0.5g</button>
+      <button class="scale-btn output-scale-btn" onclick="setOutputScale(0.1)">0.1g</button>
+    </div>
+    <div id="completed-recipes-list"></div>
+  </div>
+</div>
 
 <!-- 保存済みレシピ モーダル -->
 <div class="modal-overlay" id="saved-modal" onclick="onModalOverlayClick(event)">
@@ -1638,17 +1730,18 @@
 
   function setScale(val) {
     scaleUnit = val;
-    document.querySelectorAll('.scale-btn').forEach(btn => {
+    document.querySelectorAll('#result-card .scale-btn').forEach(btn => {
       btn.classList.toggle('active', btn.textContent === val + 'g');
     });
     if (lastRatio !== null) renderResults(lastRatio, lastBakingTime, lastBakingTemp, lastHRecipe, lastHMine);
   }
 
-  function formatAmount(val, unit) {
+  function formatAmount(val, unit, scaleOverride) {
+    const sc = scaleOverride !== undefined ? scaleOverride : scaleUnit;
     if (['g', 'ml', 'cc'].includes(unit)) {
-      const rounded = Math.round(val / scaleUnit) * scaleUnit;
-      if (rounded < scaleUnit) return '少々';
-      const decimals = scaleUnit < 1 ? (scaleUnit === 0.1 ? 1 : 1) : 0;
+      const rounded = Math.round(val / sc) * sc;
+      if (rounded < sc) return '少々';
+      const decimals = sc < 1 ? 1 : 0;
       return rounded.toFixed(decimals).replace(/\.0$/, '');
     }
     if (['個', '本', '枚'].includes(unit)) {
@@ -2214,6 +2307,24 @@
     }).join('');
 
     document.getElementById('x-result-ing-list').innerHTML = ingHtml;
+
+    // 焼き時間の目安（型の深さ変化から算出）
+    const xBakeEl = document.getElementById('x-bake-result');
+    const xBakingTime = parseFloat(document.getElementById('x-baking-time').value);
+    const xBakingTemp = parseFloat(document.getElementById('x-baking-temp').value);
+    const xHRecipe = parseFloat(xState.recipe[xRecipeType].height);
+    const xHMine   = parseFloat(xState.mine[xMineType].height);
+    if (!isNaN(xBakingTime) && xBakingTime > 0 && xHRecipe > 0 && xHMine > 0) {
+      const depthRatio = xHMine / xHRecipe;
+      const newTime = Math.round(xBakingTime * Math.sqrt(depthRatio));
+      document.getElementById('x-bake-num').textContent  = '約' + newTime;
+      document.getElementById('x-bake-temp').textContent = (!isNaN(xBakingTemp) && xBakingTemp > 0)
+        ? '/ ' + xBakingTemp + '℃' + (depthRatio > 1.2 ? '（深さが増すので10〜20℃下げてもOK）' : '') : '';
+      xBakeEl.style.display = 'block';
+    } else {
+      xBakeEl.style.display = 'none';
+    }
+
     const result = document.getElementById('x-result');
     result.classList.add('show');
     setTimeout(() => result.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
@@ -2375,6 +2486,20 @@
 
     document.getElementById('sc-ratio-note').textContent = '×' + scRatioValue + '倍で計算';
     document.getElementById('sc-result-ing-list').innerHTML = ingHtml;
+
+    // 焼き時間（参考表示）
+    const scBakeEl = document.getElementById('sc-bake-result');
+    const scBakingTime = parseFloat(document.getElementById('sc-baking-time').value);
+    const scBakingTemp = parseFloat(document.getElementById('sc-baking-temp').value);
+    if (!isNaN(scBakingTime) && scBakingTime > 0) {
+      document.getElementById('sc-bake-num').textContent = scBakingTime;
+      document.getElementById('sc-bake-temp').textContent = (!isNaN(scBakingTemp) && scBakingTemp > 0)
+        ? '/ ' + scBakingTemp + '℃' : '';
+      scBakeEl.style.display = 'block';
+    } else {
+      scBakeEl.style.display = 'none';
+    }
+
     const result = document.getElementById('sc-result');
     result.classList.add('show');
     setTimeout(() => result.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
@@ -2395,6 +2520,71 @@
     if (val >= 100) return Math.round(val).toString();
     if (val >= 10) return (Math.round(val * 10) / 10).toString();
     return (Math.round(val * 100) / 100).toString();
+  }
+
+  /* ---- メインタブ ---- */
+  let outputScale = 1;
+
+  function switchMainTab(tab) {
+    document.getElementById('tab-input').style.display  = tab === 'input'  ? '' : 'none';
+    document.getElementById('tab-output').style.display = tab === 'output' ? '' : 'none';
+    document.querySelectorAll('.main-tab').forEach((btn, i) => {
+      btn.classList.toggle('active', i === (tab === 'input' ? 0 : 1));
+    });
+    if (tab === 'output') renderCompletedRecipes();
+  }
+
+  function setOutputScale(val) {
+    outputScale = val;
+    document.querySelectorAll('.output-scale-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.textContent === val + 'g');
+    });
+    renderCompletedRecipes();
+  }
+
+  function renderCompletedRecipes() {
+    const recipes = getSavedRecipes();
+    const list = document.getElementById('completed-recipes-list');
+    if (recipes.length === 0) {
+      list.innerHTML = '<p style="text-align:center;color:#aaa;padding:32px 0">保存済みのレシピがありません<br><span style="font-size:0.8rem">レシピ入力タブで計算後に保存できます</span></p>';
+      return;
+    }
+    list.innerHTML = recipes.map(r => {
+      const ings = r.ingredients.filter(i => i.name.trim());
+      const ingHtml = ings.map(ing => {
+        const orig = parseFloat(ing.amount);
+        if (!r.ratio || isNaN(orig) || orig <= 0) {
+          return `<div class="recipe-card-ing-row"><span>${escHtml(ing.name)}</span><span class="recipe-card-ing-val" style="color:#bbb">—</span></div>`;
+        }
+        const adj = formatAmount(orig * r.ratio, ing.unit, outputScale);
+        const unitLabel = adj === '少々' ? '' : ' ' + ing.unit;
+        return `<div class="recipe-card-ing-row"><span>${escHtml(ing.name)}</span><span class="recipe-card-ing-val">${adj}${unitLabel}</span></div>`;
+      }).join('');
+      const moldInfo = (r.recipeMoldLabel && r.mineMoldLabel) ? r.recipeMoldLabel + ' → ' + r.mineMoldLabel : '';
+      const bakeInfo = r.calcBakingTime ? `焼き時間の目安：約${r.calcBakingTime}分${r.bakingTemp ? ' / ' + r.bakingTemp + '℃' : ''}` : '';
+      return `<div class="completed-recipe-card">
+        <div class="crc-header">
+          <div class="crc-name">${escHtml(r.name)}</div>
+          <button class="crc-del" onclick="deleteRecipeOutput('${r.id}')">削除</button>
+        </div>
+        ${moldInfo ? `<div class="crc-mold">${escHtml(moldInfo)}</div>` : ''}
+        <div style="background:#f8f5f0;border-radius:8px;padding:8px 10px;margin-bottom:4px">${ingHtml}</div>
+        ${bakeInfo ? `<div class="crc-bake">${bakeInfo}</div>` : ''}
+        ${r.memo ? `<div class="crc-memo">${escHtml(r.memo)}</div>` : ''}
+        <button class="crc-load-btn" onclick="loadRecipeOutput('${r.id}')">入力フォームに読み込む</button>
+      </div>`;
+    }).join('');
+  }
+
+  function deleteRecipeOutput(id) {
+    if (!confirm('このレシピを削除しますか？')) return;
+    localStorage.setItem('saved_recipes', JSON.stringify(getSavedRecipes().filter(r => r.id !== id)));
+    renderCompletedRecipes();
+  }
+
+  function loadRecipeOutput(id) {
+    loadRecipe(id);
+    switchMainTab('input');
   }
 
   /* ---- 初期化 ---- */
