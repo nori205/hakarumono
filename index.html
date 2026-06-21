@@ -1595,16 +1595,18 @@
     const NO_AMOUNT = ['少々', '適量', 'ひとつまみ', '少量', 'お好みで', '適宜'];
 
     function normNum(s) {
-      return s.replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0))
-              .replace(/½/g,'1/2').replace(/⅓/g,'1/3').replace(/¼/g,'1/4').replace(/¾/g,'3/4');
+      s = s.replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0));
+      s = s.replace(/(\d)(½|⅓|¼|¾)/g, (_, d, f) => d + ' ' + f);
+      return s.replace(/½/g,'1/2').replace(/⅓/g,'1/3').replace(/¼/g,'1/4').replace(/¾/g,'3/4');
     }
 
     // 「分量だけの行」を判定（クックパッドモバイル形式対応）
     function isAmountOnly(line) {
       const n = normNum(line.trim());
+      const AMT = '(?:\\d+\\s+)?[\\d./]+';
       return UNITS.some(u =>
-        new RegExp(`^[\\d./]+\\s*${u}\\s*$`).test(n) ||
-        new RegExp(`^${u}\\s*[\\d./]+\\s*$`).test(n)
+        new RegExp(`^${AMT}\\s*${u}\\s*$`).test(n) ||
+        new RegExp(`^${u}\\s*${AMT}\\s*$`).test(n)
       );
     }
 
@@ -1625,6 +1627,11 @@
     }
 
     function parseFrac(s) {
+      s = s.trim();
+      const mixed = s.match(/^(\d+)\s+(\d+)\/(\d+)$/);
+      if (mixed) {
+        return Math.round((parseFloat(mixed[1]) + parseFloat(mixed[2]) / parseFloat(mixed[3])) * 100) / 100;
+      }
       if (s.includes('/')) {
         const [a, b] = s.split('/');
         return Math.round(parseFloat(a) / parseFloat(b) * 100) / 100;
@@ -1636,6 +1643,7 @@
     for (let line of mergedLines.map(l => l.trim()).filter(Boolean)) {
       // 全角数字→半角、分数文字変換
       line = line.replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0));
+      line = line.replace(/(\d)(½|⅓|¼|¾)/g, (_, d, f) => d + ' ' + f);
       line = line.replace(/½/g,'1/2').replace(/⅓/g,'1/3').replace(/¼/g,'1/4').replace(/¾/g,'3/4');
       // 先頭の記号・番号を除去
       line = line.replace(/^[・●◆■▶▼▲○◎★☆※\s]+/, '');
@@ -1655,7 +1663,7 @@
       }
 
       let found = false;
-      const N = '[\\d]+(?:[./][\\d]+)?';
+      const N = '(?:\\d+\\s+)?\\d+(?:[./]\\d+)?';
       for (const u of UNITS) {
         // パターン1: 材料名 → 数字 → 単位
         let m = line.match(new RegExp(`^(.+?)[\\s：:　]*(${N})\\s*${u}\\s*$`));
@@ -1810,11 +1818,14 @@
           <span class="result-ing-val" style="color:#bbb">分量未入力</span>
         </div>`;
       }
-      const adj = formatAmount(orig * ratio, ing.unit);
+      const adjVal = orig * ratio;
+      const adj = formatAmount(adjVal, ing.unit);
       const unitLabel = adj === '少々' ? '' : ' ' + ing.unit;
+      const gramHint = getGramHint(adjVal, ing.unit, ing.name);
+      const gramSpan = gramHint ? `<span style="font-size:0.73rem;color:rgba(58,32,16,0.38);font-weight:normal;margin-left:3px">(${gramHint})</span>` : '';
       return `<div class="result-ing-row">
         <span class="result-ing-name">${escHtml(ing.name) || '（名前なし）'}</span>
-        <span class="result-ing-val">${adj}${unitLabel}</span>
+        <span class="result-ing-val">${adj}${unitLabel}${gramSpan}</span>
       </div>`;
     }).join('') : `<div class="result-ing-row">
       <span class="result-ing-name" style="color:#aaa">材料が未入力です</span>
@@ -2298,11 +2309,14 @@
           <span class="result-ing-val" style="color:#bbb">分量未入力</span>
         </div>`;
       }
-      const adj = formatAmount(orig * ratio, ing.unit);
+      const adjVal = orig * ratio;
+      const adj = formatAmount(adjVal, ing.unit);
       const unitLabel = adj === '少々' ? '' : ' ' + ing.unit;
+      const gramHint = getGramHint(adjVal, ing.unit, ing.name);
+      const gramSpan = gramHint ? `<span style="font-size:0.73rem;color:rgba(58,32,16,0.38);font-weight:normal;margin-left:3px">(${gramHint})</span>` : '';
       return `<div class="result-ing-row">
         <span class="result-ing-name">${escHtml(ing.name) || '（名前なし）'}</span>
-        <span class="result-ing-val">${adj}${unitLabel}</span>
+        <span class="result-ing-val">${adj}${unitLabel}${gramSpan}</span>
       </div>`;
     }).join('');
 
@@ -2476,11 +2490,14 @@
           <span class="result-ing-val" style="color:#bbb">分量未入力</span>
         </div>`;
       }
-      const adj = formatScAmount(orig * scRatioValue, ing.unit);
+      const adjVal = orig * scRatioValue;
+      const adj = formatScAmount(adjVal, ing.unit);
       const unitLabel = adj === '少々' ? '' : ' ' + ing.unit;
+      const gramHint = getGramHint(adjVal, ing.unit, ing.name);
+      const gramSpan = gramHint ? `<span style="font-size:0.73rem;color:rgba(58,32,16,0.38);font-weight:normal;margin-left:3px">(${gramHint})</span>` : '';
       return `<div class="result-ing-row">
         <span class="result-ing-name">${escHtml(ing.name) || '（名前なし）'}</span>
-        <span class="result-ing-val">${adj}${unitLabel}</span>
+        <span class="result-ing-val">${adj}${unitLabel}${gramSpan}</span>
       </div>`;
     }).join('');
 
@@ -2522,6 +2539,29 @@
     return (Math.round(val * 100) / 100).toString();
   }
 
+  function getGramsPerTbs(name) {
+    const n = name || '';
+    if (/塩/.test(n)) return 18;
+    if (/砂糖|グラニュー糖/.test(n)) return 9;
+    if (/薄力粉|強力粉|米粉|小麦粉|コーンスターチ|片栗粉|アーモンドプードル/.test(n)) return 9;
+    if (/バター|マーガリン|ショートニング/.test(n)) return 13;
+    if (/油|オイル/.test(n)) return 12;
+    if (/牛乳|生クリーム|豆乳|水/.test(n)) return 15;
+    if (/醤油|しょうゆ|みりん|酒|酢|蜂蜜|はちみつ/.test(n)) return 18;
+    return 12;
+  }
+
+  function getGramHint(val, unit, name) {
+    if (!['大さじ', '小さじ', 'カップ'].includes(unit)) return '';
+    if (Math.abs(Math.round(val * 2) / 2 - val) < 0.05) return '';
+    const gPerTbs = getGramsPerTbs(name);
+    let grams;
+    if (unit === '大さじ') grams = Math.round(val * gPerTbs);
+    else if (unit === '小さじ') grams = Math.round(val * gPerTbs / 3);
+    else grams = Math.round(val * gPerTbs * 200 / 15);
+    return grams > 0 ? `約${grams}g` : '';
+  }
+
   /* ---- メインタブ ---- */
   let outputScale = 1;
 
@@ -2556,9 +2596,12 @@
         if (!r.ratio || isNaN(orig) || orig <= 0) {
           return `<div class="recipe-card-ing-row"><span>${escHtml(ing.name)}</span><span class="recipe-card-ing-val" style="color:#bbb">—</span></div>`;
         }
-        const adj = formatAmount(orig * r.ratio, ing.unit, outputScale);
+        const adjVal = orig * r.ratio;
+        const adj = formatAmount(adjVal, ing.unit, outputScale);
         const unitLabel = adj === '少々' ? '' : ' ' + ing.unit;
-        return `<div class="recipe-card-ing-row"><span>${escHtml(ing.name)}</span><span class="recipe-card-ing-val">${adj}${unitLabel}</span></div>`;
+        const gramHint = getGramHint(adjVal, ing.unit, ing.name);
+        const gramSpan = gramHint ? `<span style="font-size:0.73rem;color:rgba(58,32,16,0.38);font-weight:normal;margin-left:3px">(${gramHint})</span>` : '';
+        return `<div class="recipe-card-ing-row"><span>${escHtml(ing.name)}</span><span class="recipe-card-ing-val">${adj}${unitLabel}${gramSpan}</span></div>`;
       }).join('');
       const moldInfo = (r.recipeMoldLabel && r.mineMoldLabel) ? r.recipeMoldLabel + ' → ' + r.mineMoldLabel : '';
       const bakeInfo = r.calcBakingTime ? `焼き時間の目安：約${r.calcBakingTime}分${r.bakingTemp ? ' / ' + r.bakingTemp + '℃' : ''}` : '';
