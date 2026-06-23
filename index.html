@@ -2456,9 +2456,7 @@
       const orig = parseFloat(ing.amount);
       if (isNaN(orig) || orig <= 0) return { name: ing.name, amount: '', unit: ing.unit || 'g' };
       const raw = orig * ratio;
-      const amt = ['個', '本', '枚'].includes(ing.unit)
-        ? String(Math.round(raw * 10) / 10)
-        : String(Math.round(raw));
+      const amt = String(Math.round(raw * 10) / 10);
       return { name: ing.name, amount: amt, unit: ing.unit || 'g' };
     });
     if (ingredients.length === 0) ingredients = [{ name: '', amount: '', unit: 'g' }];
