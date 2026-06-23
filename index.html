@@ -816,7 +816,7 @@
 
 <div class="main-tabs">
   <button class="main-tab active" onclick="switchMainTab('input')">レシピ入力</button>
-  <button class="main-tab" onclick="switchMainTab('output')">完成品</button>
+  <button class="main-tab" onclick="switchMainTab('output')">保存レシピ</button>
 </div>
 
 <div id="tab-input">
@@ -2441,8 +2441,48 @@
   }
 
   function loadRecipeOutput(id) {
-    loadRecipe(id);
+    const recipe = getSavedRecipes().find(r => r.id === id);
+    if (!recipe) return;
+
+    document.getElementById('recipe-name').value = recipe.name === '名前なし' ? '' : recipe.name;
+    document.getElementById('recipe-memo').value = recipe.memo || '';
+    document.getElementById('baking-time').value = recipe.calcBakingTime ? String(recipe.calcBakingTime) : (recipe.bakingTime || '');
+    document.getElementById('baking-temp').value = recipe.bakingTemp || '';
+
+    // 換算後の分量を新しい基本レシピとして読み込む
+    const ings = recipe.ingredients || [];
+    const ratio = recipe.ratio || 1;
+    ingredients = ings.map(ing => {
+      const orig = parseFloat(ing.amount);
+      if (isNaN(orig) || orig <= 0) return { name: ing.name, amount: '', unit: ing.unit || 'g' };
+      const raw = orig * ratio;
+      const amt = ['個', '本', '枚'].includes(ing.unit)
+        ? String(Math.round(raw * 10) / 10)
+        : String(Math.round(raw));
+      return { name: ing.name, amount: amt, unit: ing.unit || 'g' };
+    });
+    if (ingredients.length === 0) ingredients = [{ name: '', amount: '', unit: 'g' }];
+
+    // 自分の型 → 新しいレシピの型として設定（moldTypeがある場合のみ）
+    if (recipe.moldType && recipe.moldState && recipe.moldState.mine) {
+      setType(recipe.moldType);
+      state[recipe.moldType].recipe = JSON.parse(JSON.stringify(recipe.moldState.mine));
+      const defaults = {
+        round:   { mode: 'gou', gou: '', cm: '', height: 6 },
+        chiffon: { outer: '', inner: '', height: '' },
+        square:  { length: '', width: '', height: 5 },
+        pound:   { length: '', width: 8, height: 6 },
+        bread:   { mode: 'kin', kin: '', length: '', width: '', height: '' }
+      };
+      state[recipe.moldType].mine = JSON.parse(JSON.stringify(defaults[recipe.moldType] || defaults.round));
+    }
+
+    renderInputs();
+    renderIngredients();
+    document.getElementById('result-card').style.display = 'none';
+    document.getElementById('error-area').innerHTML = '';
     switchMainTab('input');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   /* ---- 初期化 ---- */
