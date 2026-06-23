@@ -938,8 +938,7 @@
     <span id="cross-toggle-icon">▼</span>&nbsp;異なる型に変換したい（パウンド→丸型など）
   </button>
   <div class="cross-card" id="cross-card">
-    <input class="recipe-name-input" type="text" id="x-recipe-name" placeholder="レシピ名（例：バナナパウンドケーキ）" style="margin-bottom:14px"
-      onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+    <p style="font-size:0.82rem;color:rgba(58,32,16,0.55);background:rgba(192,130,97,0.1);border-radius:8px;padding:8px 12px;margin-bottom:14px">※ 上のレシピ入力セクションの材料が換算に使われます</p>
     <div class="cross-section-label">① もとの型（レシピの型）</div>
     <div class="cross-type-tabs" id="x-recipe-tabs">
       <button class="cross-type-tab active" onclick="setXType('recipe','round')">丸型</button>
@@ -961,47 +960,6 @@
       <button class="cross-type-tab" onclick="setXType('mine','bread')">食パン</button>
     </div>
     <div id="x-mine-inputs"></div>
-
-    <div class="cross-section-label" style="margin-top:14px">③ レシピの材料</div>
-    <div id="x-paste-area" style="display:none;margin-bottom:10px">
-      <textarea id="x-paste-input" class="memo-textarea" style="min-height:90px;font-size:0.85rem"
-        placeholder="レシピの材料をここに貼り付けてください&#10;&#10;例：&#10;薄力粉 100g&#10;砂糖 80g&#10;バター 60g&#10;卵 2個"></textarea>
-      <p style="font-size:0.75rem;color:rgba(58,32,16,0.5);margin:6px 0;line-height:1.5">
-        ※ クックパッドのレシピはほぼそのまま貼れます。手書きメモは正しく取れないことがあるので、読み込み後に確認してください。
-      </p>
-      <div style="display:flex;gap:8px;margin-top:4px">
-        <button onclick="applyXPaste()" style="flex:2;padding:10px;background:#C08261;color:white;border:none;border-radius:8px;font-size:0.88rem;font-weight:bold;font-family:inherit;cursor:pointer">読み込む</button>
-        <button onclick="closeXPasteArea()" style="flex:1;padding:10px;background:white;color:#3a2010;border:1px solid rgba(58,32,16,0.2);border-radius:8px;font-size:0.88rem;font-family:inherit;cursor:pointer">キャンセル</button>
-      </div>
-    </div>
-    <button class="add-ing-btn" onclick="openXPasteArea()" style="margin-bottom:8px">まとめて貼り付け</button>
-    <div class="ingredient-header">
-      <span style="flex:2">材料名</span>
-      <span style="flex:1;text-align:right">分量</span>
-      <span style="flex:0 0 62px;text-align:center">単位</span>
-      <span style="flex:0 0 28px"></span>
-    </div>
-    <div id="x-ingredients-list"></div>
-    <button class="add-ing-btn" onclick="addXIngredient()" style="margin-bottom:12px">＋ 材料を追加</button>
-
-    <div class="cross-section-label" style="margin-top:12px">④ 焼き時間（任意）</div>
-    <div style="display:flex;gap:8px;margin-bottom:4px">
-      <div class="input-row" style="flex:1;margin:0">
-        <label style="flex:0 0 56px">焼き時間</label>
-        <input type="number" id="x-baking-time" placeholder="例：35" min="1" step="1"
-          style="flex:1;min-width:0;padding:10px 8px;border:1px solid rgba(58,32,16,0.2);border-radius:8px;font-size:0.95rem;text-align:right;background:white;font-family:inherit;color:#3a2010"
-          onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
-        <span class="unit">分</span>
-      </div>
-      <div class="input-row" style="flex:1;margin:0">
-        <label style="flex:0 0 36px">温度</label>
-        <input type="number" id="x-baking-temp" placeholder="例：180" min="100" step="10"
-          style="flex:1;min-width:0;padding:10px 8px;border:1px solid rgba(58,32,16,0.2);border-radius:8px;font-size:0.95rem;text-align:right;background:white;font-family:inherit;color:#3a2010"
-          onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
-        <span class="unit">℃</span>
-      </div>
-    </div>
-    <p style="font-size:0.75rem;color:rgba(58,32,16,0.4);margin-bottom:12px">型の深さの変化から焼き時間の目安を算出します</p>
 
     <div class="cross-error" id="x-error"></div>
     <button class="cross-calc-btn" onclick="calculateX()">材料を換算する</button>
@@ -1030,29 +988,9 @@
   </button>
   <div class="cross-card" id="sc-card">
 
-    <div class="cross-section-label">① 基本レシピの材料</div>
-    <div id="sc-paste-area" style="display:none;margin-bottom:10px">
-      <textarea id="sc-paste-input" class="memo-textarea" style="min-height:90px;font-size:0.85rem"
-        placeholder="レシピの材料をここに貼り付けてください&#10;&#10;例：&#10;薄力粉 100g&#10;砂糖 80g&#10;バター 60g&#10;卵 2個"></textarea>
-      <p style="font-size:0.75rem;color:rgba(58,32,16,0.5);margin:6px 0;line-height:1.5">
-        ※ クックパッドのレシピはほぼそのまま貼れます。手書きメモは正しく取れないことがあるので、読み込み後に確認してください。
-      </p>
-      <div style="display:flex;gap:8px;margin-top:4px">
-        <button onclick="applyScPaste()" style="flex:2;padding:10px;background:#C08261;color:white;border:none;border-radius:8px;font-size:0.88rem;font-weight:bold;font-family:inherit;cursor:pointer">読み込む</button>
-        <button onclick="closeScPasteArea()" style="flex:1;padding:10px;background:white;color:#3a2010;border:1px solid rgba(58,32,16,0.2);border-radius:8px;font-size:0.88rem;font-family:inherit;cursor:pointer">キャンセル</button>
-      </div>
-    </div>
-    <button class="add-ing-btn" onclick="openScPasteArea()" style="margin-bottom:8px">まとめて貼り付け</button>
-    <div class="ingredient-header">
-      <span style="flex:2">材料名</span>
-      <span style="flex:1;text-align:right">分量</span>
-      <span style="flex:0 0 62px;text-align:center">単位</span>
-      <span style="flex:0 0 28px"></span>
-    </div>
-    <div id="sc-ingredients-list"></div>
-    <button class="add-ing-btn" onclick="addScIngredient()" style="margin-bottom:16px">＋ 材料を追加</button>
+    <p style="font-size:0.82rem;color:rgba(58,32,16,0.55);background:rgba(192,130,97,0.1);border-radius:8px;padding:8px 12px;margin-bottom:14px">※ 上のレシピ入力セクションの材料が換算に使われます</p>
 
-    <div class="cross-section-label">② 倍率を選ぶ</div>
+    <div class="cross-section-label">① 倍率を選ぶ</div>
     <div class="sc-ratio-grid">
       <button class="sc-ratio-btn" data-ratio="0.5"  onclick="setScRatio(0.5)">×1/2</button>
       <button class="sc-ratio-btn" data-ratio="0.75" onclick="setScRatio(0.75)">×3/4</button>
@@ -1070,25 +1008,6 @@
       <span style="font-size:0.9rem;color:#3a2010;flex-shrink:0">倍</span>
     </div>
     <p style="font-size:0.75rem;color:rgba(58,32,16,0.45);margin-top:-4px;margin-bottom:8px">上のボタン以外の倍率はここに直接入力できます</p>
-
-    <div class="cross-section-label" style="margin-top:12px">③ 焼き時間（任意）</div>
-    <div style="display:flex;gap:8px;margin-bottom:4px">
-      <div class="input-row" style="flex:1;margin:0">
-        <label style="flex:0 0 56px">焼き時間</label>
-        <input type="number" id="sc-baking-time" placeholder="例：35" min="1" step="1"
-          style="flex:1;min-width:0;padding:10px 8px;border:1px solid rgba(58,32,16,0.2);border-radius:8px;font-size:0.95rem;text-align:right;background:white;font-family:inherit;color:#3a2010"
-          onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
-        <span class="unit">分</span>
-      </div>
-      <div class="input-row" style="flex:1;margin:0">
-        <label style="flex:0 0 36px">温度</label>
-        <input type="number" id="sc-baking-temp" placeholder="例：180" min="100" step="10"
-          style="flex:1;min-width:0;padding:10px 8px;border:1px solid rgba(58,32,16,0.2);border-radius:8px;font-size:0.95rem;text-align:right;background:white;font-family:inherit;color:#3a2010"
-          onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
-        <span class="unit">℃</span>
-      </div>
-    </div>
-    <p style="font-size:0.75rem;color:rgba(58,32,16,0.4);margin-bottom:12px">材料の倍率変更のみでは焼き時間は基本的に変わりません。参考として表示します</p>
 
     <div class="cross-error" id="sc-error"></div>
     <button class="cross-calc-btn" onclick="calculateScaleCalc()">分量を計算する</button>
@@ -1711,22 +1630,6 @@
     closePasteArea();
   }
 
-  function openXPasteArea() {
-    document.getElementById('x-paste-area').style.display = 'block';
-    document.getElementById('x-paste-input').focus();
-  }
-  function closeXPasteArea() {
-    document.getElementById('x-paste-area').style.display = 'none';
-    document.getElementById('x-paste-input').value = '';
-  }
-  function applyXPaste() {
-    const text = document.getElementById('x-paste-input').value;
-    const parsed = parseIngredientLines(text);
-    if (parsed.length === 0) { alert('材料を読み取れませんでした。\n「材料名 分量 単位」の形式で入力してください。'); return; }
-    xIngredients = parsed.length > 0 ? parsed : [{ name: '', amount: '', unit: 'g' }];
-    renderXIngredients();
-    closeXPasteArea();
-  }
 
   function escHtml(str) {
     return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -2096,7 +1999,7 @@
     const icon = document.getElementById('cross-toggle-icon');
     const isOpen = card.classList.toggle('open');
     icon.textContent = isOpen ? '▲' : '▼';
-    if (isOpen) { renderXInputs('recipe'); renderXInputs('mine'); renderXIngredients(); }
+    if (isOpen) { renderXInputs('recipe'); renderXInputs('mine'); }
   }
 
   function setXType(side, type) {
@@ -2251,40 +2154,6 @@
     }
   }
 
-  let xIngredients = [
-    { name: '', amount: '', unit: 'g' },
-    { name: '', amount: '', unit: 'g' },
-    { name: '', amount: '', unit: 'g' },
-  ];
-
-  function renderXIngredients() {
-    const el = document.getElementById('x-ingredients-list');
-    if (!el) return;
-    el.innerHTML = xIngredients.map((ing, i) => `
-      <div class="ingredient-row">
-        <input class="ing-name" type="text" placeholder="例：薄力粉" value="${escHtml(ing.name)}"
-          oninput="xIngredients[${i}].name=this.value"
-          onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
-        <input class="ing-amount" type="number" placeholder="100" value="${ing.amount}"
-          min="0" step="any"
-          oninput="xIngredients[${i}].amount=this.value"
-          onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
-        <select class="ing-unit" onchange="xIngredients[${i}].unit=this.value">
-          ${UNITS.map(u => `<option value="${u}"${ing.unit===u?' selected':''}>${u}</option>`).join('')}
-        </select>
-        <button class="ing-del" onclick="removeXIngredient(${i})">×</button>
-      </div>
-    `).join('');
-  }
-
-  function addXIngredient() {
-    xIngredients.push({ name: '', amount: '', unit: 'g' });
-    renderXIngredients();
-  }
-
-  function removeXIngredient(i) {
-    if (xIngredients.length > 1) { xIngredients.splice(i, 1); renderXIngredients(); }
-  }
 
   function calculateX() {
     const errEl = document.getElementById('x-error');
@@ -2296,9 +2165,9 @@
     const ratio = mineVol / recipeVol;
     lastXRatio = ratio;
 
-    const filled = xIngredients.filter(ing => ing.name.trim() || ing.amount !== '');
+    const filled = ingredients.filter(ing => ing.name.trim() || ing.amount !== '');
     if (filled.length === 0) {
-      errEl.textContent = '③ レシピの材料に材料を入力してください。';
+      errEl.textContent = '上のレシピ入力セクションに材料を入力してください。';
       return;
     }
     const ingHtml = filled.map(ing => {
@@ -2324,8 +2193,8 @@
 
     // 焼き時間の目安（型の深さ変化から算出）
     const xBakeEl = document.getElementById('x-bake-result');
-    const xBakingTime = parseFloat(document.getElementById('x-baking-time').value);
-    const xBakingTemp = parseFloat(document.getElementById('x-baking-temp').value);
+    const xBakingTime = parseFloat(document.getElementById('baking-time').value);
+    const xBakingTemp = parseFloat(document.getElementById('baking-temp').value);
     const xHRecipe = parseFloat(xState.recipe[xRecipeType].height);
     const xHMine   = parseFloat(xState.mine[xMineType].height);
     if (!isNaN(xBakingTime) && xBakingTime > 0 && xHRecipe > 0 && xHMine > 0) {
@@ -2345,8 +2214,8 @@
   }
 
   function saveXRecipe() {
-    const name = (document.getElementById('x-recipe-name').value || '').trim() || '名前なし';
-    const filled = xIngredients.filter(i => i.name.trim());
+    const name = (document.getElementById('recipe-name').value || '').trim() || '名前なし';
+    const filled = ingredients.filter(i => i.name.trim());
     const convertedIngredients = lastXRatio ? filled.map(ing => {
       const orig = parseFloat(ing.amount);
       const adj = (!isNaN(orig) && orig > 0) ? formatAmount(orig * lastXRatio, ing.unit) : null;
@@ -2355,9 +2224,9 @@
     const recipe = {
       id: Date.now().toString(),
       name,
-      memo: '',
-      bakingTime: '',
-      bakingTemp: '',
+      memo: document.getElementById('recipe-memo').value,
+      bakingTime: document.getElementById('baking-time').value,
+      bakingTemp: document.getElementById('baking-temp').value,
       recipeType: xRecipeType,
       mineType: xMineType,
       recipeState: JSON.parse(JSON.stringify(xState.recipe[xRecipeType])),
@@ -2381,11 +2250,6 @@
   }
 
   /* ---- 倍率計算 ---- */
-  let scIngredients = [
-    { name: '', amount: '', unit: 'g' },
-    { name: '', amount: '', unit: 'g' },
-    { name: '', amount: '', unit: 'g' },
-  ];
   let scRatioValue = null;
   let scScaleUnit = 1;
 
@@ -2394,57 +2258,8 @@
     const icon = document.getElementById('sc-toggle-icon');
     const isOpen = card.classList.toggle('open');
     icon.textContent = isOpen ? '▲' : '▼';
-    if (isOpen) renderScIngredients();
   }
 
-  function renderScIngredients() {
-    const el = document.getElementById('sc-ingredients-list');
-    if (!el) return;
-    el.innerHTML = scIngredients.map((ing, i) => `
-      <div class="ingredient-row">
-        <input class="ing-name" type="text" placeholder="例：薄力粉" value="${escHtml(ing.name)}"
-          oninput="scIngredients[${i}].name=this.value"
-          onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
-        <input class="ing-amount" type="number" placeholder="100" value="${ing.amount}"
-          min="0" step="any"
-          oninput="scIngredients[${i}].amount=this.value"
-          onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
-        <select class="ing-unit" onchange="scIngredients[${i}].unit=this.value">
-          ${UNITS.map(u => `<option value="${u}"${ing.unit===u?' selected':''}>${u}</option>`).join('')}
-        </select>
-        <button class="ing-del" onclick="removeScIngredient(${i})">×</button>
-      </div>
-    `).join('');
-  }
-
-  function addScIngredient() {
-    scIngredients.push({ name: '', amount: '', unit: 'g' });
-    renderScIngredients();
-  }
-
-  function removeScIngredient(i) {
-    if (scIngredients.length > 1) { scIngredients.splice(i, 1); renderScIngredients(); }
-  }
-
-  function openScPasteArea() {
-    document.getElementById('sc-paste-area').style.display = 'block';
-    document.getElementById('sc-paste-input').focus();
-  }
-  function closeScPasteArea() {
-    document.getElementById('sc-paste-area').style.display = 'none';
-    document.getElementById('sc-paste-input').value = '';
-  }
-  function applyScPaste() {
-    const text = document.getElementById('sc-paste-input').value;
-    const parsed = parseIngredientLines(text);
-    if (parsed.length === 0) {
-      alert('材料を読み取れませんでした。\n手動で入力するか、形式を確認してください。');
-      return;
-    }
-    scIngredients = parsed;
-    renderScIngredients();
-    closeScPasteArea();
-  }
 
   function setScRatio(val) {
     scRatioValue = val;
@@ -2474,12 +2289,12 @@
     const errEl = document.getElementById('sc-error');
     errEl.textContent = '';
     if (!scRatioValue || scRatioValue <= 0) {
-      errEl.textContent = '② 倍率を選ぶか、数値を入力してください。';
+      errEl.textContent = '① 倍率を選ぶか、数値を入力してください。';
       return;
     }
-    const filled = scIngredients.filter(ing => ing.name.trim() || ing.amount !== '');
+    const filled = ingredients.filter(ing => ing.name.trim() || ing.amount !== '');
     if (filled.length === 0) {
-      errEl.textContent = '① 材料を入力してください。';
+      errEl.textContent = '上のレシピ入力セクションに材料を入力してください。';
       return;
     }
     const ingHtml = filled.map(ing => {
@@ -2506,8 +2321,8 @@
 
     // 焼き時間（参考表示）
     const scBakeEl = document.getElementById('sc-bake-result');
-    const scBakingTime = parseFloat(document.getElementById('sc-baking-time').value);
-    const scBakingTemp = parseFloat(document.getElementById('sc-baking-temp').value);
+    const scBakingTime = parseFloat(document.getElementById('baking-time').value);
+    const scBakingTemp = parseFloat(document.getElementById('baking-temp').value);
     if (!isNaN(scBakingTime) && scBakingTime > 0) {
       document.getElementById('sc-bake-num').textContent = scBakingTime;
       document.getElementById('sc-bake-temp').textContent = (!isNaN(scBakingTemp) && scBakingTemp > 0)
