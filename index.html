@@ -340,6 +340,9 @@
     }
     .result-ing-name { font-size: 0.9rem; color: #3a2010; }
     .result-ing-val { font-size: 1rem; font-weight: bold; color: #C08261; }
+    .adj-toggle-btn { display: block; width: 100%; padding: 8px; margin: 10px 0 0; border: 1.5px dashed #d0c8c0; border-radius: 8px; background: transparent; font-size: 0.83rem; font-family: inherit; color: rgba(58,32,16,0.5); cursor: pointer; text-align: center; }
+    .adj-toggle-btn.active { border-color: #C08261; color: #C08261; background: rgba(192,130,97,0.05); }
+    .result-adj-input { width: 68px; padding: 4px 8px; border: 1.5px solid #C08261; border-radius: 6px; font-size: 1rem; font-weight: bold; font-family: inherit; color: #C08261; background: rgba(192,130,97,0.07); outline: none; text-align: right; }
     .result-ratio-note {
       text-align: center;
       font-size: 0.8rem;
@@ -987,6 +990,7 @@
       <button class="scale-btn" onclick="setScale(0.1)">0.1g</button>
     </div>
     <div id="result-ing-list"></div>
+    <button class="adj-toggle-btn" id="adj-toggle-btn" onclick="toggleAdjustMode()">分量を調整する</button>
     <div class="result-ratio-note" id="result-ratio-note"></div>
     <div class="volume-info">
       <div class="volume-chip">
@@ -1759,6 +1763,15 @@
 
   let scaleUnit = 1;
   let lastRatio = null;
+  let adjustMode = false;
+
+  function toggleAdjustMode() {
+    adjustMode = !adjustMode;
+    const btn = document.getElementById('adj-toggle-btn');
+    btn.textContent = adjustMode ? '調整を終わる' : '分量を調整する';
+    btn.classList.toggle('active', adjustMode);
+    renderResults(lastRatio, lastBakingTime, lastBakingTemp, lastHRecipe, lastHMine);
+  }
   let lastBakingTime = NaN, lastBakingTemp = NaN, lastHRecipe = null, lastHMine = null;
 
   function setScale(val) {
@@ -1766,7 +1779,7 @@
     document.querySelectorAll('#result-card .scale-btn').forEach(btn => {
       btn.classList.toggle('active', btn.textContent === val + 'g');
     });
-    if (lastRatio !== null) renderResults(lastRatio, lastBakingTime, lastBakingTemp, lastHRecipe, lastHMine);
+    if (lastRatio !== null && !adjustMode) renderResults(lastRatio, lastBakingTime, lastBakingTemp, lastHRecipe, lastHMine);
   }
 
   function formatAmount(val, unit, scaleOverride) {
@@ -1819,6 +1832,11 @@
 
     const ratio = mineVol / recipeVol;
     lastRatio = ratio;
+    if (adjustMode) {
+      adjustMode = false;
+      const adjBtn = document.getElementById('adj-toggle-btn');
+      if (adjBtn) { adjBtn.textContent = '分量を調整する'; adjBtn.classList.remove('active'); }
+    }
     document.getElementById('recipe-vol').textContent = Math.round(recipeVol) + ' cm³';
     document.getElementById('mine-vol').textContent   = Math.round(mineVol)   + ' cm³';
 
@@ -1844,6 +1862,16 @@
         </div>`;
       }
       const adjVal = orig * ratio;
+      if (adjustMode) {
+        const preVal = String(Math.round(adjVal * 10) / 10);
+        return `<div class="result-ing-row">
+          <span class="result-ing-name">${escHtml(ing.name) || '（名前なし）'}</span>
+          <div style="display:flex;align-items:center;gap:5px">
+            <input class="result-adj-input" type="text" inputmode="decimal" value="${preVal}" data-unit="${escHtml(ing.unit)}">
+            <span class="result-ing-val" style="font-size:0.9rem">${escHtml(ing.unit)}</span>
+          </div>
+        </div>`;
+      }
       const adj = formatAmount(adjVal, ing.unit);
       const unitLabel = adj === '少々' ? '' : ' ' + ing.unit;
       const gramHint = getGramHint(adjVal, ing.unit, ing.name);
@@ -1912,11 +1940,24 @@
   function saveRecipe() {
     const name = document.getElementById('recipe-name').value.trim() || '名前なし';
     const filled = ingredients.filter(i => i.name.trim());
-    const convertedIngredients = lastRatio ? filled.map(ing => {
-      const orig = parseFloat(ing.amount);
-      const adj = (!isNaN(orig) && orig > 0) ? formatAmount(orig * lastRatio, ing.unit) : null;
-      return { name: ing.name, amount: adj, unit: (adj && adj !== '少々') ? ing.unit : '' };
-    }) : [];
+    let convertedIngredients, saveIngredients, saveRatio;
+    if (adjustMode) {
+      const inputs = [...document.querySelectorAll('#result-ing-list .result-adj-input')];
+      convertedIngredients = filled.map((ing, i) => {
+        const amt = inputs[i] ? inputs[i].value.trim() : '';
+        return { name: ing.name, amount: amt, unit: ing.unit || 'g' };
+      });
+      saveIngredients = convertedIngredients;
+      saveRatio = 1;
+    } else {
+      convertedIngredients = lastRatio ? filled.map(ing => {
+        const orig = parseFloat(ing.amount);
+        const adj = (!isNaN(orig) && orig > 0) ? formatAmount(orig * lastRatio, ing.unit) : null;
+        return { name: ing.name, amount: adj, unit: (adj && adj !== '少々') ? ing.unit : '' };
+      }) : [];
+      saveIngredients = filled;
+      saveRatio = lastRatio;
+    }
     const calcBakingTime = (!isNaN(lastBakingTime) && lastBakingTime > 0 && lastHRecipe && lastHMine)
       ? Math.round(lastBakingTime * Math.sqrt(lastHMine / lastHRecipe)) : null;
     const recipe = {
@@ -1927,9 +1968,9 @@
       bakingTemp: document.getElementById('baking-temp').value,
       moldType: currentType,
       moldState: JSON.parse(JSON.stringify(state[currentType])),
-      ingredients: JSON.parse(JSON.stringify(filled)),
+      ingredients: JSON.parse(JSON.stringify(saveIngredients)),
       convertedIngredients,
-      ratio: lastRatio,
+      ratio: saveRatio,
       calcBakingTime,
       recipeMoldLabel: getMoldLabel(currentType, state[currentType].recipe),
       mineMoldLabel: getMoldLabel(currentType, state[currentType].mine),
