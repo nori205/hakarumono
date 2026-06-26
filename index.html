@@ -539,6 +539,49 @@
       padding: 6px;
       flex-shrink: 0;
     }
+    .modal-filter {
+      padding: 10px 16px 4px;
+      flex-shrink: 0;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .recipe-search {
+      width: 100%;
+      padding: 8px 14px;
+      border: 1.5px solid #e0d8d0;
+      border-radius: 20px;
+      font-size: 0.88rem;
+      font-family: inherit;
+      background: #f8f5f0;
+      color: #3a2010;
+      outline: none;
+    }
+    .recipe-search:focus { border-color: #C08261; }
+    .type-chips {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      scrollbar-width: none;
+    }
+    .type-chips::-webkit-scrollbar { display: none; }
+    .type-chip {
+      flex-shrink: 0;
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1.5px solid #e0d8d0;
+      background: white;
+      font-size: 0.78rem;
+      font-family: inherit;
+      color: #3a2010;
+      cursor: pointer;
+    }
+    .type-chip.active {
+      background: #C08261;
+      border-color: #C08261;
+      color: white;
+      font-weight: bold;
+    }
 
     /* ---- レシピカード ---- */
     .recipe-card-modal {
@@ -1048,6 +1091,10 @@
       <button class="scale-btn output-scale-btn" onclick="setOutputScale(0.5)">0.5g</button>
       <button class="scale-btn output-scale-btn" onclick="setOutputScale(0.1)">0.1g</button>
     </div>
+    <div style="margin:10px 0 4px">
+      <input class="recipe-search" type="search" id="completed-search-input" placeholder="レシピ名で検索…" oninput="onCompletedSearch(this.value)">
+      <div class="type-chips" id="completed-type-chips" style="margin-top:8px"></div>
+    </div>
     <div id="completed-recipes-list"></div>
   </div>
 </div>
@@ -1058,6 +1105,10 @@
     <div class="modal-header">
       <h2>保存済みレシピ</h2>
       <button class="modal-close" onclick="closeSavedRecipes()">×</button>
+    </div>
+    <div class="modal-filter">
+      <input class="recipe-search" type="search" id="recipe-search-input" placeholder="レシピ名で検索…" oninput="onRecipeSearch(this.value)">
+      <div class="type-chips" id="type-chips"></div>
     </div>
     <div class="modal-body" id="saved-recipes-list"></div>
   </div>
@@ -1854,7 +1905,33 @@
   }
 
   /* ---- モーダル ---- */
+  const savedFilter = { query: '', moldType: 'all' };
+  const MOLD_TYPE_LABELS = { all: 'すべて', round: '丸型', chiffon: 'シフォン', square: 'スクエア', pound: 'パウンド', bread: '食パン' };
+
+  function renderTypeChips() {
+    const usedTypes = new Set(getSavedRecipes().map(r => r.moldType).filter(Boolean));
+    const types = ['all', ...Object.keys(MOLD_TYPE_LABELS).filter(t => t !== 'all' && usedTypes.has(t))];
+    document.getElementById('type-chips').innerHTML = types.map(t =>
+      `<button class="type-chip${savedFilter.moldType === t ? ' active' : ''}" onclick="setMoldFilter('${t}')">${MOLD_TYPE_LABELS[t]}</button>`
+    ).join('');
+  }
+
+  function onRecipeSearch(val) {
+    savedFilter.query = val.trim();
+    renderSavedRecipesList();
+  }
+
+  function setMoldFilter(type) {
+    savedFilter.moldType = type;
+    renderTypeChips();
+    renderSavedRecipesList();
+  }
+
   function openSavedRecipes() {
+    savedFilter.query = '';
+    savedFilter.moldType = 'all';
+    document.getElementById('recipe-search-input').value = '';
+    renderTypeChips();
     renderSavedRecipesList();
     document.getElementById('saved-modal').style.display = 'flex';
   }
@@ -1868,10 +1945,18 @@
   }
 
   function renderSavedRecipesList() {
-    const recipes = getSavedRecipes();
+    let recipes = getSavedRecipes();
     const list = document.getElementById('saved-recipes-list');
+    if (savedFilter.query) {
+      const q = savedFilter.query.toLowerCase();
+      recipes = recipes.filter(r => r.name.toLowerCase().includes(q));
+    }
+    if (savedFilter.moldType !== 'all') {
+      recipes = recipes.filter(r => r.moldType === savedFilter.moldType);
+    }
     if (recipes.length === 0) {
-      list.innerHTML = '<p style="text-align:center;color:#aaa;padding:32px 0">保存済みのレシピがありません</p>';
+      const isEmpty = getSavedRecipes().length === 0;
+      list.innerHTML = `<p style="text-align:center;color:#aaa;padding:32px 0">${isEmpty ? '保存済みのレシピがありません' : '条件に合うレシピがありません'}</p>`;
       return;
     }
     list.innerHTML = recipes.map(r => `
@@ -2387,7 +2472,14 @@
     document.querySelectorAll('.main-tab').forEach((btn, i) => {
       btn.classList.toggle('active', i === (tab === 'input' ? 0 : 1));
     });
-    if (tab === 'output') renderCompletedRecipes();
+    if (tab === 'output') {
+      completedFilter.query = '';
+      completedFilter.moldType = 'all';
+      const si = document.getElementById('completed-search-input');
+      if (si) si.value = '';
+      renderCompletedTypeChips();
+      renderCompletedRecipes();
+    }
   }
 
   function setOutputScale(val) {
@@ -2398,11 +2490,44 @@
     renderCompletedRecipes();
   }
 
+  const completedFilter = { query: '', moldType: 'all' };
+
+  function renderCompletedTypeChips() {
+    const usedTypes = new Set(getSavedRecipes().map(r => r.moldType).filter(Boolean));
+    const types = ['all', ...Object.keys(MOLD_TYPE_LABELS).filter(t => t !== 'all' && usedTypes.has(t))];
+    const el = document.getElementById('completed-type-chips');
+    if (!el) return;
+    el.innerHTML = types.map(t =>
+      `<button class="type-chip${completedFilter.moldType === t ? ' active' : ''}" onclick="setCompletedMoldFilter('${t}')">${MOLD_TYPE_LABELS[t]}</button>`
+    ).join('');
+  }
+
+  function onCompletedSearch(val) {
+    completedFilter.query = val.trim();
+    renderCompletedRecipes();
+  }
+
+  function setCompletedMoldFilter(type) {
+    completedFilter.moldType = type;
+    renderCompletedTypeChips();
+    renderCompletedRecipes();
+  }
+
   function renderCompletedRecipes() {
-    const recipes = getSavedRecipes();
+    let recipes = getSavedRecipes();
     const list = document.getElementById('completed-recipes-list');
+    if (completedFilter.query) {
+      const q = completedFilter.query.toLowerCase();
+      recipes = recipes.filter(r => r.name.toLowerCase().includes(q));
+    }
+    if (completedFilter.moldType !== 'all') {
+      recipes = recipes.filter(r => r.moldType === completedFilter.moldType);
+    }
     if (recipes.length === 0) {
-      list.innerHTML = '<p style="text-align:center;color:#aaa;padding:32px 0">保存済みのレシピがありません<br><span style="font-size:0.8rem">レシピ入力タブで計算後に保存できます</span></p>';
+      const isEmpty = getSavedRecipes().length === 0;
+      list.innerHTML = isEmpty
+        ? '<p style="text-align:center;color:#aaa;padding:32px 0">保存済みのレシピがありません<br><span style="font-size:0.8rem">レシピ入力タブで計算後に保存できます</span></p>'
+        : '<p style="text-align:center;color:#aaa;padding:32px 0">条件に合うレシピがありません</p>';
       return;
     }
     list.innerHTML = recipes.map(r => {
