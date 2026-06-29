@@ -1113,6 +1113,7 @@
         </div>
         <div style="font-size:0.72rem;color:rgba(58,32,16,0.45);margin-top:6px;line-height:1.5">※ 材料の倍率を変えるだけでは焼き時間は変わりません。型のサイズが同じ場合はレシピ通りで大丈夫です。</div>
       </div>
+      <button class="save-recipe-btn" id="sc-save-recipe-btn" onclick="saveScRecipe()">このレシピを保存する</button>
     </div>
 
   </div>
@@ -1128,8 +1129,10 @@
       <button class="scale-btn output-scale-btn" onclick="setOutputScale(0.1)">0.1g</button>
     </div>
     <div style="margin:10px 0 4px">
+      <p style="font-size:0.78rem;font-weight:bold;color:rgba(58,32,16,0.55);margin-bottom:4px">キーワード検索</p>
       <input class="recipe-search" type="search" id="completed-search-input" placeholder="レシピ名で検索…" oninput="onCompletedSearch(this.value)">
-      <div class="type-chips" id="completed-type-chips" style="margin-top:8px"></div>
+      <p style="font-size:0.78rem;font-weight:bold;color:rgba(58,32,16,0.55);margin-top:10px;margin-bottom:4px">型別検索</p>
+      <div class="type-chips" id="completed-type-chips" style="margin-top:4px"></div>
     </div>
     <div id="completed-recipes-list"></div>
   </div>
@@ -2424,6 +2427,7 @@
       memo: document.getElementById('recipe-memo').value,
       bakingTime: document.getElementById('baking-time').value,
       bakingTemp: document.getElementById('baking-temp').value,
+      moldType: xMineType,
       recipeType: xRecipeType,
       mineType: xMineType,
       recipeState: JSON.parse(JSON.stringify(xState.recipe[xRecipeType])),
@@ -2441,6 +2445,41 @@
     localStorage.setItem('saved_recipes', JSON.stringify(recipes));
     filled.forEach(i => addToHistory(i.name));
     const btn = document.getElementById('x-save-recipe-btn');
+    btn.textContent = '保存しました！';
+    btn.disabled = true;
+    setTimeout(() => { btn.textContent = 'このレシピを保存する'; btn.disabled = false; }, 2000);
+  }
+
+  function saveScRecipe() {
+    const name = (document.getElementById('recipe-name').value || '').trim() || '名前なし';
+    const filled = ingredients.filter(i => i.name.trim());
+    const convertedIngredients = (scRatioValue && scRatioValue > 0) ? filled.map(ing => {
+      const orig = parseFloat(ing.amount);
+      const adj = (!isNaN(orig) && orig > 0) ? formatScAmount(orig * scRatioValue, ing.unit) : null;
+      return { name: ing.name, amount: adj, unit: (adj && adj !== '少々') ? ing.unit : '' };
+    }) : [];
+    const scBakingTime = parseFloat(document.getElementById('baking-time').value);
+    const recipe = {
+      id: Date.now().toString(),
+      name,
+      memo: document.getElementById('recipe-memo').value,
+      bakingTime: document.getElementById('baking-time').value,
+      bakingTemp: document.getElementById('baking-temp').value,
+      moldType: currentType,
+      moldState: JSON.parse(JSON.stringify(state[currentType])),
+      ingredients: JSON.parse(JSON.stringify(filled)),
+      convertedIngredients,
+      ratio: scRatioValue || 1,
+      calcBakingTime: (!isNaN(scBakingTime) && scBakingTime > 0) ? scBakingTime : null,
+      recipeMoldLabel: getMoldLabel(currentType, state[currentType].recipe),
+      mineMoldLabel: getMoldLabel(currentType, state[currentType].mine),
+      savedAt: new Date().toLocaleDateString('ja-JP')
+    };
+    const recipes = getSavedRecipes();
+    recipes.unshift(recipe);
+    localStorage.setItem('saved_recipes', JSON.stringify(recipes));
+    filled.forEach(i => addToHistory(i.name));
+    const btn = document.getElementById('sc-save-recipe-btn');
     btn.textContent = '保存しました！';
     btn.disabled = true;
     setTimeout(() => { btn.textContent = 'このレシピを保存する'; btn.disabled = false; }, 2000);
