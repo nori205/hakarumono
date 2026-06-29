@@ -793,7 +793,20 @@
     .crc-load-btn:active { background: #a86e50; }
     .crc-edit { border: 1.5px solid #e0d8d0; background: white; color: #C08261; font-size: 0.78rem; font-weight: bold; font-family: inherit; cursor: pointer; padding: 4px 10px; border-radius: 6px; }
     .crc-edit:active { background: #fdf0e8; }
+    .crc-print { border: 1.5px solid #e0d8d0; background: white; color: #888; font-size: 0.78rem; font-weight: bold; font-family: inherit; cursor: pointer; padding: 4px 10px; border-radius: 6px; }
+    .crc-print:active { background: #f5f0e8; }
     .crc-actions { display: flex; gap: 4px; }
+
+    /* ---- 印刷エリア ---- */
+    #print-area { display: none; font-family: 'M PLUS Rounded 1c', sans-serif; color: #3a2010; padding: 24px; }
+    #print-area table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+    #print-area th { text-align: left; font-size: 0.75rem; color: #888; border-bottom: 2px solid #ddd; padding: 6px 4px; }
+    #print-area td { padding: 8px 4px; border-bottom: 1px solid #eee; font-size: 0.95rem; }
+    @media print {
+      header, .main-tabs, #tab-input, .cross-section, #tab-output { display: none !important; }
+      #print-area { display: block !important; }
+      body { background: white; padding: 0; }
+    }
 
     /* ---- 編集モーダル ---- */
     .edit-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 300; align-items: flex-end; justify-content: center; }
@@ -1205,6 +1218,8 @@
     </div>
   </div>
 </div>
+
+<div id="print-area"></div>
 
 <script>
   let currentType = 'round';
@@ -2787,6 +2802,7 @@
         <div class="crc-header">
           <div class="crc-name">${escHtml(r.name)}</div>
           <div class="crc-actions">
+            <button class="crc-print" onclick="printRecipe('${r.id}')">PDF/印刷</button>
             <button class="crc-edit" onclick="openEditRecipe('${r.id}')">編集</button>
             <button class="crc-del" onclick="deleteRecipeOutput('${r.id}')">削除</button>
           </div>
@@ -2852,6 +2868,33 @@
     document.getElementById('error-area').innerHTML = '';
     switchMainTab('input');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ---- 印刷・PDF ---- */
+  function printRecipe(id) {
+    const r = getSavedRecipes().find(x => x.id === id);
+    if (!r) return;
+    const ings = (r.convertedIngredients && r.convertedIngredients.length > 0)
+      ? r.convertedIngredients : r.ingredients;
+    const moldInfo = (r.recipeMoldLabel && r.mineMoldLabel)
+      ? r.recipeMoldLabel + ' → ' + r.mineMoldLabel : '';
+    const bakeInfo = r.calcBakingTime
+      ? `約${r.calcBakingTime}分${r.bakingTemp ? ' / ' + r.bakingTemp + '℃' : ''}` : '';
+    const ingRows = ings.map(ing =>
+      `<tr><td>${escHtml(ing.name)}</td><td style="text-align:right;font-weight:bold;color:#C08261">${ing.amount || ''}${(ing.amount && ing.unit) ? ' ' + ing.unit : ''}</td></tr>`
+    ).join('');
+    document.getElementById('print-area').innerHTML = `
+      <h1 style="font-size:1.4rem;margin-bottom:4px;font-weight:bold">${escHtml(r.name)}</h1>
+      <p style="font-size:0.8rem;color:#888;margin-bottom:16px">${r.savedAt}${moldInfo ? ' · ' + escHtml(moldInfo) : ''}</p>
+      <table>
+        <tr><th>材料</th><th style="text-align:right">分量</th></tr>
+        ${ingRows}
+      </table>
+      ${bakeInfo ? `<div style="background:#fff8f0;border-radius:8px;padding:10px 14px;margin-bottom:12px"><div style="font-size:0.72rem;color:#888;margin-bottom:4px">焼き時間の目安</div><div style="font-size:1rem;font-weight:bold;color:#C08261">${escHtml(bakeInfo)}</div></div>` : ''}
+      ${r.memo ? `<div style="background:#f5f0e8;border-radius:8px;padding:10px 14px"><div style="font-size:0.72rem;color:#888;margin-bottom:6px">作り方メモ</div><div style="font-size:0.88rem;line-height:1.7;white-space:pre-wrap">${escHtml(r.memo)}</div></div>` : ''}
+      <div style="margin-top:32px;font-size:0.72rem;color:#bbb;text-align:center">はかるもん</div>
+    `;
+    window.print();
   }
 
   /* ---- 初期化 ---- */
