@@ -971,12 +971,14 @@
       <div class="input-row">
         <label>焼き時間</label>
         <input type="number" id="baking-time" placeholder="例：35" min="1" step="1"
+          oninput="syncBakingTime(this.value)"
           onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
         <span class="unit">分</span>
       </div>
       <div class="input-row">
         <label>温度</label>
         <input type="number" id="baking-temp" placeholder="例：180" min="100" step="10"
+          oninput="syncBakingTemp(this.value)"
           onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
         <span class="unit">℃</span>
       </div>
@@ -1054,6 +1056,25 @@
     </div>
     <div id="x-mine-inputs"></div>
 
+    <div style="border-top:1px solid rgba(58,32,16,0.1);margin-top:12px;padding-top:12px;">
+      <p style="font-size:0.85rem;font-weight:bold;color:#3a2010;margin-bottom:10px;">焼き時間・温度（任意）</p>
+      <div class="input-row">
+        <label>焼き時間</label>
+        <input type="number" id="x-baking-time" placeholder="例：35" min="1" step="1"
+          oninput="syncBakingTime(this.value)"
+          onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+        <span class="unit">分</span>
+      </div>
+      <div class="input-row">
+        <label>温度</label>
+        <input type="number" id="x-baking-temp" placeholder="例：180" min="100" step="10"
+          oninput="syncBakingTemp(this.value)"
+          onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+        <span class="unit">℃</span>
+      </div>
+      <p style="font-size:0.78rem;color:rgba(58,32,16,0.4);margin-top:4px;">入力すると、型サイズから焼き時間の目安を算出します</p>
+    </div>
+
     <div class="cross-error" id="x-error"></div>
     <button class="cross-calc-btn" onclick="calculateX()">材料を換算する</button>
 
@@ -1107,6 +1128,25 @@
       <span style="font-size:0.9rem;color:#3a2010;flex-shrink:0">倍</span>
     </div>
     <p style="font-size:0.75rem;color:rgba(58,32,16,0.45);margin-top:-4px;margin-bottom:8px">上のボタン以外の倍率はここに直接入力できます</p>
+
+    <div style="border-top:1px solid rgba(58,32,16,0.1);margin-top:12px;padding-top:12px;">
+      <p style="font-size:0.85rem;font-weight:bold;color:#3a2010;margin-bottom:10px;">焼き時間・温度（任意）</p>
+      <div class="input-row">
+        <label>焼き時間</label>
+        <input type="number" id="sc-baking-time" placeholder="例：35" min="1" step="1"
+          oninput="syncBakingTime(this.value)"
+          onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+        <span class="unit">分</span>
+      </div>
+      <div class="input-row">
+        <label>温度</label>
+        <input type="number" id="sc-baking-temp" placeholder="例：180" min="100" step="10"
+          oninput="syncBakingTemp(this.value)"
+          onfocus="setTimeout(()=>this.scrollIntoView({behavior:'smooth',block:'center'}),400)">
+        <span class="unit">℃</span>
+      </div>
+      <p style="font-size:0.78rem;color:rgba(58,32,16,0.4);margin-top:4px;">入力すると、型のサイズが同じ場合の焼き時間の目安として表示します</p>
+    </div>
 
     <div class="cross-error" id="sc-error"></div>
     <button class="cross-calc-btn" onclick="calculateScaleCalc()">分量を計算する</button>
@@ -2019,6 +2059,8 @@
     document.getElementById('recipe-memo').value = recipe.memo || '';
     document.getElementById('baking-time').value = recipe.bakingTime || '';
     document.getElementById('baking-temp').value = recipe.bakingTemp || '';
+    syncBakingTime(recipe.bakingTime || '');
+    syncBakingTemp(recipe.bakingTemp || '');
     setType(recipe.moldType);
     Object.assign(state[recipe.moldType].recipe, recipe.moldState.recipe);
     Object.assign(state[recipe.moldType].mine,   recipe.moldState.mine);
@@ -2216,12 +2258,30 @@
     }
   };
 
+  function syncBakingTime(val) {
+    ['baking-time', 'x-baking-time', 'sc-baking-time'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.value !== val) el.value = val;
+    });
+  }
+
+  function syncBakingTemp(val) {
+    ['baking-temp', 'x-baking-temp', 'sc-baking-temp'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.value !== val) el.value = val;
+    });
+  }
+
   function toggleCross() {
     const card = document.getElementById('cross-card');
     const icon = document.getElementById('cross-toggle-icon');
     const isOpen = card.classList.toggle('open');
     icon.textContent = isOpen ? '▲' : '▼';
-    if (isOpen) { renderXInputs('recipe'); renderXInputs('mine'); }
+    if (isOpen) {
+      renderXInputs('recipe'); renderXInputs('mine');
+      syncBakingTime(document.getElementById('baking-time').value);
+      syncBakingTemp(document.getElementById('baking-temp').value);
+    }
   }
 
   function setXType(side, type) {
@@ -2530,6 +2590,10 @@
     const icon = document.getElementById('sc-toggle-icon');
     const isOpen = card.classList.toggle('open');
     icon.textContent = isOpen ? '▲' : '▼';
+    if (isOpen) {
+      syncBakingTime(document.getElementById('baking-time').value);
+      syncBakingTemp(document.getElementById('baking-temp').value);
+    }
   }
 
 
@@ -2849,8 +2913,11 @@
 
     document.getElementById('recipe-name').value = recipe.name === '名前なし' ? '' : recipe.name;
     document.getElementById('recipe-memo').value = recipe.memo || '';
-    document.getElementById('baking-time').value = recipe.calcBakingTime ? String(recipe.calcBakingTime) : (recipe.bakingTime || '');
+    const loadedBakingTime = recipe.calcBakingTime ? String(recipe.calcBakingTime) : (recipe.bakingTime || '');
+    document.getElementById('baking-time').value = loadedBakingTime;
     document.getElementById('baking-temp').value = recipe.bakingTemp || '';
+    syncBakingTime(loadedBakingTime);
+    syncBakingTemp(recipe.bakingTemp || '');
 
     // 換算後の分量を新しい基本レシピとして読み込む
     const ings = recipe.ingredients || [];
