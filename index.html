@@ -1059,6 +1059,12 @@
 
     <div class="cross-result" id="x-result">
       <div style="font-size:0.85rem;font-weight:bold;color:#3a2010;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(192,130,97,0.2)">換算後の材料</div>
+      <div class="scale-row" style="margin-bottom:10px">
+        <span class="scale-label">はかりの単位：</span>
+        <button class="scale-btn x-scale-btn active" data-scale="1"   onclick="setXScale(1)">1g</button>
+        <button class="scale-btn x-scale-btn"        data-scale="0.5" onclick="setXScale(0.5)">0.5g</button>
+        <button class="scale-btn x-scale-btn"        data-scale="0.1" onclick="setXScale(0.1)">0.1g</button>
+      </div>
       <div id="x-result-ing-list"></div>
       <div id="x-bake-result" style="display:none;margin:10px 0;padding:10px 14px;background:white;border-radius:10px">
         <div style="font-size:0.78rem;color:rgba(58,32,16,0.5);margin-bottom:4px">焼き時間の目安</div>
@@ -2189,6 +2195,7 @@
 
   /* ---- 別型変換 ---- */
   let lastXRatio = null;
+  let xScaleUnit = 1;
   let xRecipeType = 'round';
   let xMineType   = 'round';
   const xTypes = ['round', 'chiffon', 'square', 'pound', 'bread'];
@@ -2370,6 +2377,39 @@
   }
 
 
+  function setXScale(val) {
+    xScaleUnit = val;
+    document.querySelectorAll('.x-scale-btn').forEach(btn => {
+      btn.classList.toggle('active', parseFloat(btn.dataset.scale) === val);
+    });
+    if (lastXRatio !== null) {
+      const filled = ingredients.filter(ing => ing.name.trim() || ing.amount !== '');
+      renderXIngList(filled, lastXRatio);
+    }
+  }
+
+  function renderXIngList(filled, ratio) {
+    const ingHtml = filled.map(ing => {
+      const orig = parseFloat(ing.amount);
+      if (isNaN(orig) || orig <= 0) {
+        return `<div class="result-ing-row">
+          <span class="result-ing-name">${escHtml(ing.name) || '（名前なし）'}</span>
+          <span class="result-ing-val" style="color:#bbb">分量未入力</span>
+        </div>`;
+      }
+      const adjVal = orig * ratio;
+      const adj = formatAmount(adjVal, ing.unit, xScaleUnit);
+      const unitLabel = adj === '少々' ? '' : ' ' + ing.unit;
+      const gramHint = getGramHint(adjVal, ing.unit, ing.name);
+      const gramSpan = gramHint ? `<span style="font-size:0.73rem;color:rgba(58,32,16,0.38);font-weight:normal;margin-left:3px">(${gramHint})</span>` : '';
+      return `<div class="result-ing-row">
+        <span class="result-ing-name">${escHtml(ing.name) || '（名前なし）'}</span>
+        <span class="result-ing-val">${adj}${unitLabel}${gramSpan}</span>
+      </div>`;
+    }).join('');
+    document.getElementById('x-result-ing-list').innerHTML = ingHtml;
+  }
+
   function calculateX() {
     const errEl = document.getElementById('x-error');
     errEl.textContent = '';
@@ -2385,26 +2425,7 @@
       errEl.textContent = '上のレシピ入力セクションに材料を入力してください。';
       return;
     }
-    const ingHtml = filled.map(ing => {
-      const orig = parseFloat(ing.amount);
-      if (isNaN(orig) || orig <= 0) {
-        return `<div class="result-ing-row">
-          <span class="result-ing-name">${escHtml(ing.name) || '（名前なし）'}</span>
-          <span class="result-ing-val" style="color:#bbb">分量未入力</span>
-        </div>`;
-      }
-      const adjVal = orig * ratio;
-      const adj = formatAmount(adjVal, ing.unit);
-      const unitLabel = adj === '少々' ? '' : ' ' + ing.unit;
-      const gramHint = getGramHint(adjVal, ing.unit, ing.name);
-      const gramSpan = gramHint ? `<span style="font-size:0.73rem;color:rgba(58,32,16,0.38);font-weight:normal;margin-left:3px">(${gramHint})</span>` : '';
-      return `<div class="result-ing-row">
-        <span class="result-ing-name">${escHtml(ing.name) || '（名前なし）'}</span>
-        <span class="result-ing-val">${adj}${unitLabel}${gramSpan}</span>
-      </div>`;
-    }).join('');
-
-    document.getElementById('x-result-ing-list').innerHTML = ingHtml;
+    renderXIngList(filled, ratio);
 
     // 焼き時間の目安（型の深さ変化から算出）
     const xBakeEl = document.getElementById('x-bake-result');
